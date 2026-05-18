@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useVelocity, useSpring, useMotionTemplate } from 'framer-motion';
-import { Star, Truck, Heart, Palette, ChevronRight, Camera as IgIcon, MessageCircle, Play, Sparkles } from 'lucide-react';
+import { Star, Truck, Heart, Palette, ChevronRight, Camera as IgIcon, MessageCircle, Play, Sparkles, AlertTriangle, ArrowRight, ShieldCheck, Clock, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CakeCard from '../components/CakeCard';
 import cake3D from '../assets/cake_white_bg.png';
@@ -8,18 +8,47 @@ import floatingPastryImg from '../assets/floating_pastry.png';
 
 const LandingPage = () => {
   const popularCakes = [
-    { id: 1, name: "Velvet Rose Dream", price: "$45", rating: 4.9, image: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&w=400&q=80" },
-    { id: 2, name: "Chocolate Truffle", price: "$38", rating: 4.8, image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=400&q=80" },
-    { id: 3, name: "Lemon Zest Bliss", price: "$42", rating: 4.7, image: "https://images.unsplash.com/photo-1519340333755-5672c2393a83?auto=format&fit=crop&w=400&q=80" },
-    { id: 4, name: "Berry Vanilla Spark", price: "$50", rating: 5.0, image: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=400&q=80" },
+    { id: 1, name: "Velvet Rose Dream", price: "$45", rating: 4.9, image: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&w=400&q=80", category: "Trending" },
+    { id: 2, name: "Chocolate Truffle", price: "$38", rating: 4.8, image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=400&q=80", category: "Best Seller" },
+    { id: 3, name: "Lemon Zest Bliss", price: "$42", rating: 4.7, image: "https://images.unsplash.com/photo-1519340333755-5672c2393a83?auto=format&fit=crop&w=400&q=80", category: "Trending" },
+    { id: 4, name: "Berry Vanilla Spark", price: "$50", rating: 5.0, image: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=400&q=80", category: "Best Seller" },
+  ];
+
+  const categories = [
+    { name: "Birthday Cakes", path: "/birthday", color: "#FFD6A5", image: "https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?auto=format&fit=crop&w=300&q=80", desc: "Magical custom birthday tiers." },
+    { name: "Wedding Collection", path: "/wedding", color: "#FFE0E5", image: "https://images.unsplash.com/photo-1535254973040-607b474cb8c2?auto=format&fit=crop&w=300&q=80", desc: "Gold & floral luxury masterpieces." },
+    { name: "Custom Studio", path: "/custom", color: "#FFF9E5", image: "https://images.unsplash.com/photo-1557308536-ee471ef2c390?auto=format&fit=crop&w=300&q=80", desc: "Designed by you, baked by experts." },
+  ];
+
+  const testimonials = [
+    { name: "Jessica Miller", role: "Bride", review: "Our 3-tier floral wedding cake was an absolute masterpiece! It looked stunning and tasted like heaven.", stars: 5, avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&q=80" },
+    { name: "Liam Thorne", role: "Parent", review: "The Dinosaur theme cake made my son's 5th birthday unforgettable. Incredible attention to detail!", stars: 5, avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80" },
+    { name: "Sophia Khan", role: "Food Critic", review: "The WhatsApp ordering is so convenient. CakeFlow is truly the Shopify operating system for high-end bakers.", stars: 5, avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" }
+  ];
+
+  const igPosts = [
+    { id: 1, image: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&w=400&q=80", likes: "1.2k" },
+    { id: 2, image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=400&q=80", likes: "849" },
+    { id: 3, image: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=400&q=80", likes: "2.1k" },
+    { id: 4, image: "https://images.unsplash.com/photo-1519340333755-5672c2393a83?auto=format&fit=crop&w=400&q=80", likes: "932" }
   ];
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
   
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 767);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    try {
+      const items = JSON.parse(localStorage.getItem('recently_viewed') || '[]');
+      setRecentlyViewed(items.slice(0, 4));
+    } catch (e) {
+      console.error("Failed to parse recently viewed items", e);
+    }
   }, []);
 
   const { scrollY } = useScroll();
@@ -58,9 +87,25 @@ const LandingPage = () => {
   const dripY3 = useTransform(scrollY, [0, 600], [0, 150]);
 
   return (
-    <div className="landing-page">
-      {/* Hero Section Refined */}
-      <section className="hero-container">
+    <div className="landing-page" style={{ paddingTop: '80px' }}>
+      
+      {/* Dynamic Offer & Emergency Delivery Banners */}
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ background: 'var(--color-brown-dark)', color: 'white', padding: '0.6rem 5%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.8rem', fontSize: '0.85rem', fontWeight: 700, zIndex: 10 }}>
+          <Sparkles size={14} color="var(--color-pink)" />
+          <span>USE CODE <b style={{ color: 'var(--color-pink)' }}>WELCOME10</b> FOR 10% OFF YOUR FIRST ORDER!</span>
+        </div>
+        <div style={{ background: 'var(--gradient-pink)', color: 'white', padding: '0.8rem 5%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.8rem', fontSize: '0.9rem', fontWeight: 800, zIndex: 10, boxShadow: 'var(--shadow-soft)' }}>
+          <AlertTriangle size={16} />
+          <span>NEED A CAKE TODAY? 🚨 CONTACT OUR INSTANT WHATSAPP LINE FOR EXPRESS 2-HOUR EMERGENCY DELIVERY!</span>
+          <a href="https://wa.me/yournumber" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'white', color: 'var(--color-pink)', padding: '0.3rem 1rem', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 900, marginLeft: '1rem' }}>
+            CHAT NOW <ArrowRight size={12} />
+          </a>
+        </div>
+      </div>
+
+      {/* Hero Section */}
+      <section className="hero-container" style={{ minHeight: 'calc(100vh - 120px)', paddingTop: '40px' }}>
         {/* Background Decorative Elements */}
         <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '600px', height: '600px', background: 'rgba(242, 140, 163, 0.08)', borderRadius: '50%', filter: 'blur(80px)' }}></div>
         <div style={{ position: 'absolute', bottom: '10%', left: '-5%', width: '400px', height: '400px', background: 'rgba(255, 214, 165, 0.15)', borderRadius: '50%', filter: 'blur(60px)' }}></div>
@@ -167,8 +212,48 @@ const LandingPage = () => {
         </motion.div>
       </section>
 
-      {/* Popular Cakes */}
-      <section style={{ padding: '10rem 5%' }}>
+      {/* Popular Categories Section */}
+      <section style={{ padding: '8rem 5% 4rem', textAlign: 'center' }}>
+        <h2 style={{ fontSize: '4rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '-1px' }}>
+          Explore Our <span style={{ color: 'var(--color-pink)' }}>Collections</span>
+        </h2>
+        <p style={{ color: 'var(--color-brown)', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 5rem', fontWeight: 600, opacity: 0.8 }}>
+          Delicious artisanal categories designed to wow your guests and elevate your feed.
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem' }}>
+          {categories.map((cat, idx) => (
+            <motion.div
+              key={idx}
+              whileHover={{ y: -15, scale: 1.02 }}
+              style={{
+                background: 'white',
+                borderRadius: '30px',
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow-soft)',
+                border: '2px solid var(--color-cream)'
+              }}
+            >
+              <div style={{ height: '240px', overflow: 'hidden', position: 'relative' }}>
+                <img src={cat.image} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', background: cat.color, padding: '0.4rem 1.2rem', borderRadius: '15px', fontWeight: 900, fontSize: '0.75rem', color: 'var(--color-brown-dark)' }}>
+                  TRENDING NOW
+                </div>
+              </div>
+              <div style={{ padding: '2.5rem', textAlign: 'left' }}>
+                <h3 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '0.8rem', color: 'var(--color-brown-dark)' }}>{cat.name}</h3>
+                <p style={{ color: 'var(--color-brown)', fontSize: '1rem', opacity: 0.7, marginBottom: '2rem', fontWeight: 600 }}>{cat.desc}</p>
+                <Link to={cat.path} className="btn-secondary" style={{ display: 'inline-flex', padding: '0.8rem 2rem', fontSize: '0.9rem', width: '100%', boxSizing: 'border-box', justifyContent: 'center', gap: '0.5rem', alignItems: 'center' }}>
+                  Explore Category <ChevronRight size={16} />
+                </Link>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Signature Treats (Original Popular Cakes) */}
+      <section style={{ padding: '8rem 5% 4rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '6rem' }}>
           <div>
             <h2 style={{ fontSize: '4rem', fontWeight: 900, marginBottom: '0.5rem' }}>Our Signature Treats</h2>
@@ -186,8 +271,216 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Trending & Bestsellers Section (Extensions) */}
+      <section style={{ padding: '6rem 5% 4rem', backgroundColor: 'var(--color-white)' }}>
+        <div style={{ textAlign: 'center', marginBottom: '6rem' }}>
+          <h2 style={{ fontSize: '4rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '-1px' }}>
+            Trending & <span style={{ color: 'var(--color-pink)' }}>Best Sellers</span>
+          </h2>
+          <p style={{ color: 'var(--color-brown)', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto', fontWeight: 600, opacity: 0.8 }}>
+            These creations are taking Instagram by storm. Try one today!
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
+          {[
+            { id: 104, name: "Rainbow Cream Swirl", price: "$40", rating: 4.9, image: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=400&q=80", tag: "BEST SELLER" },
+            { id: 106, name: "Elegant Floral Bday", price: "$50", rating: 4.9, image: "https://images.unsplash.com/photo-1562233237-10d74499d8c1?auto=format&fit=crop&w=400&q=80", tag: "TRENDING" },
+            { id: 201, name: "Eternal White Lace", price: "$450", rating: 5.0, image: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&w=400&q=80", tag: "LUXURY" }
+          ].map((cake) => (
+            <motion.div key={cake.id} whileHover={{ y: -10 }} style={{ background: 'var(--color-cream)', borderRadius: '24px', overflow: 'hidden', padding: '1rem', border: '1px solid rgba(122, 78, 58, 0.05)' }}>
+              <div style={{ position: 'relative', borderRadius: '18px', overflow: 'hidden' }}>
+                <img src={cake.image} alt={cake.name} style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover' }} />
+                <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'var(--gradient-pink)', color: 'white', padding: '0.4rem 1rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 900 }}>
+                  {cake.tag}
+                </div>
+              </div>
+              <div style={{ padding: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '0.5rem' }}>{cake.name}</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#FFD700', fontWeight: 800, fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+                  <Star size={16} fill="#FFD700" /> {cake.rating}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--color-pink)' }}>{cake.price}</span>
+                  <Link to={`/product/${cake.id}`} className="btn-primary" style={{ padding: '0.6rem 1.5rem', fontSize: '0.85rem', textDecoration: 'none' }}>Order Now</Link>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Seasonal Offers Section */}
+      <section style={{ padding: '8rem 5%', position: 'relative', overflow: 'hidden' }}>
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(74, 44, 42, 0.95) 0%, rgba(122, 78, 58, 0.9) 100%)',
+          borderRadius: '40px',
+          padding: '5rem',
+          color: 'white',
+          position: 'relative',
+          overflow: 'hidden',
+          display: 'grid',
+          gridTemplateColumns: '1.2fr 1fr',
+          alignItems: 'center',
+          gap: '4rem',
+          boxShadow: 'var(--shadow-medium)'
+        }}>
+          {/* Decorative circular backgrounds */}
+          <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '400px', height: '400px', background: 'rgba(242, 140, 163, 0.2)', borderRadius: '50%', filter: 'blur(70px)' }}></div>
+
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem 1.2rem', borderRadius: '15px', fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-pink)', marginBottom: '2rem' }}>
+              <Clock size={16} /> SEASONAL FLAVOR EVENT
+            </div>
+            <h2 style={{ fontSize: '4.5rem', fontWeight: 900, color: 'white', lineHeight: 1, marginBottom: '2rem' }}>
+              Summer Berry <span style={{ color: 'var(--color-pink)', fontStyle: 'italic' }}>Jubilee</span>
+            </h2>
+            <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, marginBottom: '3rem', fontWeight: 500 }}>
+              Enjoy our signature handpicked strawberry and raspberry mousse cakes with a premium <b style={{ color: 'white' }}>20% seasonal markdown</b>. Lovingly prepared with organic ingredients.
+            </p>
+            <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+              <Link to="/birthday" className="btn-primary" style={{ fontSize: '1.1rem', padding: '1.1rem 3rem' }}>Shop Seasonal</Link>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', fontWeight: 800 }}>PROMO CODE</span>
+                <span style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-pink)' }}>FESTIVE20</span>
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <img 
+              src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=500&q=80" 
+              alt="Seasonal Berry Cake" 
+              style={{ width: '100%', maxWidth: '380px', borderRadius: '30px', border: '8px solid rgba(255,255,255,0.1)', boxShadow: 'var(--shadow-medium)', transform: 'rotate(3deg)' }} 
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Recently Viewed Section */}
+      {recentlyViewed.length > 0 && (
+        <section style={{ padding: '4rem 5% 6rem' }}>
+          <h2 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '3rem', color: 'var(--color-brown-dark)' }}>
+            Recently <span style={{ color: 'var(--color-pink)' }}>Viewed</span>
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '2.5rem' }}>
+            {recentlyViewed.map((cake) => (
+              <motion.div 
+                key={cake.id} 
+                whileHover={{ y: -5 }} 
+                style={{ background: 'white', borderRadius: '20px', padding: '1rem', border: '1px solid rgba(122, 78, 58, 0.05)', boxShadow: 'var(--shadow-soft)', display: 'flex', gap: '1rem', alignItems: 'center' }}
+              >
+                <img src={cake.image} style={{ width: '80px', height: '80px', borderRadius: '12px', objectFit: 'cover' }} />
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>{cake.name}</h4>
+                  <div style={{ color: 'var(--color-pink)', fontWeight: 900, marginTop: '0.3rem' }}>{cake.price}</div>
+                  <Link to={`/product/${cake.id}`} style={{ fontSize: '0.8rem', color: 'var(--color-brown)', fontWeight: 700, textDecoration: 'underline', marginTop: '0.2rem', display: 'inline-block' }}>View Details</Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Customer Testimonials Section */}
+      <section style={{ padding: '8rem 5%', backgroundColor: 'var(--color-cream)', position: 'relative' }}>
+        <div style={{ textAlign: 'center', marginBottom: '6rem' }}>
+          <h2 style={{ fontSize: '4.5rem', fontWeight: 900, color: 'var(--color-brown-dark)', letterSpacing: '-1px' }}>
+            Sweet Reviews from <span style={{ color: 'var(--color-pink)' }}>Happy Clients</span>
+          </h2>
+          <p style={{ color: 'var(--color-brown)', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto', fontWeight: 600, opacity: 0.8 }}>
+            Don't just take our word for it—see what our Instagram followers are raving about.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
+          {testimonials.map((item, idx) => (
+            <motion.div
+              key={idx}
+              whileHover={{ y: -10 }}
+              style={{
+                background: 'white',
+                padding: '3rem',
+                borderRadius: '30px',
+                boxShadow: 'var(--shadow-soft)',
+                border: '1px solid rgba(122, 78, 58, 0.05)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', color: '#FFD700', gap: '0.2rem', marginBottom: '1.5rem' }}>
+                  {[...Array(item.stars)].map((_, i) => <Star key={i} size={18} fill="#FFD700" color="#FFD700" />)}
+                </div>
+                <p style={{ color: 'var(--color-brown-dark)', fontSize: '1.1rem', fontStyle: 'italic', lineHeight: 1.7, marginBottom: '2rem', fontWeight: 500 }}>
+                  "{item.review}"
+                </p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <img src={item.avatar} style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }} alt={item.name} />
+                <div>
+                  <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.1rem' }}>{item.name}</h4>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--color-pink)', fontWeight: 800 }}>{item.role}</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Instagram Gallery Section */}
+      <section style={{ padding: '8rem 5% 10rem', backgroundColor: 'white', textAlign: 'center' }}>
+        <h2 style={{ fontSize: '4.5rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '-1px' }}>
+          Follow Us on <span style={{ color: 'var(--color-pink)', fontStyle: 'italic' }}>Instagram</span>
+        </h2>
+        <p style={{ color: 'var(--color-brown)', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 6rem', fontWeight: 600, opacity: 0.8 }}>
+          Join our 50k+ family online! Double tap to satisfy your sweet cravings. 📸
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2.5rem' }}>
+          {igPosts.map((post) => (
+            <motion.a
+              key={post.id}
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              style={{
+                position: 'relative',
+                borderRadius: '24px',
+                overflow: 'hidden',
+                boxShadow: 'var(--shadow-soft)',
+                aspectRatio: '1/1',
+                display: 'block'
+              }}
+            >
+              <img src={post.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Instagram Post Mock" />
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'rgba(74, 44, 42, 0.7)',
+                opacity: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: 900,
+                fontSize: '1.2rem',
+                gap: '0.5rem',
+                transition: 'opacity 0.3s ease',
+              }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+              onMouseOut={(e) => e.currentTarget.style.opacity = 0}
+            >
+              <Heart fill="white" size={24} /> {post.likes}
+            </div>
+            </motion.a>
+          ))}
+        </div>
+      </section>
+
       {/* Why Choose Us Redesign */}
-      <section style={{ padding: '10rem 5%', backgroundColor: 'var(--color-cream)', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ padding: '8rem 5%', backgroundColor: 'var(--color-cream)', position: 'relative', overflow: 'hidden' }}>
         {/* Background blobs for depth */}
         <div style={{ position: 'absolute', top: 0, left: '-10%', width: '500px', height: '500px', background: 'rgba(242, 140, 163, 0.15)', borderRadius: '50%', filter: 'blur(80px)' }}></div>
         <div style={{ position: 'absolute', bottom: 0, right: '-10%', width: '600px', height: '600px', background: 'rgba(255, 214, 165, 0.2)', borderRadius: '50%', filter: 'blur(100px)' }}></div>

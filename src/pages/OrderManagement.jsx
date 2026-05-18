@@ -1,29 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingBag, ChevronLeft, Search, Filter, MoreVertical, Download, Eye, LayoutDashboard, Package, Users, DollarSign, BarChart2, Truck, Ticket, Settings as SettingsIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 
 const OrderManagement = () => {
   const { switchRole } = useAuth();
-  const [orders, setOrders] = useState([
-    { id: "#1024", customer: "Alice Green", cake: "Velvet Rose Dream", amount: "$45", status: "Baking", payment: "Paid", delivery: "Today, 4:00 PM" },
-    { id: "#1023", customer: "Bob Smith", cake: "Chocolate Truffle", amount: "$38", status: "Out for Delivery", payment: "Paid", delivery: "Today, 2:30 PM" },
-    { id: "#1022", customer: "Charlie Brown", cake: "Lemon Zest Bliss", amount: "$42", status: "Placed", payment: "Pending", delivery: "Tomorrow, 10:00 AM" },
-    { id: "#1021", customer: "Diana Prince", cake: "Berry Vanilla", amount: "$50", status: "Delivered", payment: "Paid", delivery: "Yesterday" },
-    { id: "#1020", customer: "Edward Norton", cake: "Midnight Chocolate", amount: "$40", status: "Delivered", payment: "Paid", delivery: "Yesterday" },
-    { id: "#1019", customer: "Fiona Apple", cake: "Lavender Garden", amount: "$45", status: "Placed", payment: "Paid", delivery: "Tomorrow, 12:00 PM" },
-  ]);
+  const [orders, setOrders] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('cake_orders') || '[]');
+      if (stored.length === 0) {
+        // Seed some beautiful demo orders so the platform is immediately premium and ready to explore
+        const initial = [
+          { id: "CF-1024", customer: "Alice Green", cake: "Velvet Rose Dream", amount: "$45.00", status: "Baking", payment: "Paid", delivery: "May 19, 2026, 4:00 PM", deliverySlot: { date: "2026-05-19", time: "Afternoon" }, address: "123 Cherry Rd, Sweet City, NY", email: "alice@example.com", items: [{ name: "Velvet Rose Dream", price: "$45.00", weight: "1kg", quantity: 1, image: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&w=50&q=80" }] },
+          { id: "CF-1023", customer: "Bob Smith", cake: "Chocolate Truffle", amount: "$38.00", status: "Out for Delivery", payment: "Paid", delivery: "May 19, 2026, 2:30 PM", deliverySlot: { date: "2026-05-19", time: "Afternoon" }, address: "456 Maple St, Sweet City, NY", email: "bob@example.com", items: [{ name: "Chocolate Truffle", price: "$38.00", weight: "1kg", quantity: 1, image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=50&q=80" }] },
+          { id: "CF-1022", customer: "Charlie Brown", cake: "Lemon Zest Bliss", amount: "$42.00", status: "Placed", payment: "Pending", delivery: "May 20, 2026, 10:00 AM", deliverySlot: { date: "2026-05-20", time: "Morning" }, address: "789 Pine Ave, Sweet City, NY", email: "charlie@example.com", items: [{ name: "Lemon Zest Bliss", price: "$42.00", weight: "1kg", quantity: 1, image: "https://images.unsplash.com/photo-1519340333755-5672c2393a83?auto=format&fit=crop&w=50&q=80" }] }
+        ];
+        localStorage.setItem('cake_orders', JSON.stringify(initial));
+        setOrders(initial);
+      } else {
+        setOrders(stored);
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  }, []);
 
   const handleStatusChange = (id, newStatus) => {
-    setOrders(orders.map(order => order.id === id ? { ...order, status: newStatus } : order));
-    // Persist for tracking page demo
-    localStorage.setItem('current_order_status', newStatus);
+    const updated = orders.map(order => order.id === id ? { ...order, status: newStatus } : order);
+    setOrders(updated);
+    localStorage.setItem('cake_orders', JSON.stringify(updated));
   };
 
   const handleExportCSV = () => {
     const csvContent = "data:text/csv;charset=utf-8," 
       + "ID,Customer,Order Details,Status,Payment,Delivery\n"
-      + orders.map(o => `${o.id},${o.customer},${o.cake} - ${o.amount},${o.status},${o.payment},${o.delivery}`).join("\n");
+      + orders.map(o => `${o.id},${o.customer},${o.cake} - ${o.amount},${o.status},${o.payment},${o.delivery || 'N/A'}`).join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -45,11 +59,18 @@ const OrderManagement = () => {
     { name: 'Settings', icon: <SettingsIcon size={20} />, path: '/admin/settings' },
   ];
 
+  // Filter orders dynamically based on search box input
+  const filteredOrders = orders.filter(order => 
+    order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    order.cake.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream)' }}>
       
       {/* Sidebar */}
-      <aside style={{ width: '280px', backgroundColor: 'var(--color-white)', borderRight: '1px solid rgba(122, 78, 58, 0.1)', padding: '2.5rem 1.5rem', position: 'fixed', height: '100vh', boxSizing: 'border-box', zIndex: 1100, display: 'flex', flexDirection: 'column' }}>
+      <aside className="admin-sidebar" style={{ width: '280px', backgroundColor: 'var(--color-white)', borderRight: '1px solid rgba(122, 78, 58, 0.1)', padding: '2.5rem 1.5rem', position: 'fixed', height: '100vh', boxSizing: 'border-box', zIndex: 1100, display: 'flex', flexDirection: 'column' }}>
         <div style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 'bold', marginBottom: '2.5rem', color: 'var(--color-brown-dark)' }}>
           CakeFlow <span style={{ fontSize: '0.9rem', color: 'var(--color-pink)', fontWeight: 800 }}>ADMIN</span>
         </div>
@@ -83,7 +104,7 @@ const OrderManagement = () => {
         </nav>
       </aside>
 
-      <main style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
+      <main className="admin-main" style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
         <header style={{ marginBottom: '4rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '1rem' }}>
             <Link to="/admin" style={{ color: 'var(--color-brown)', background: 'white', padding: '0.5rem', borderRadius: '50%', boxShadow: 'var(--shadow-soft)' }}><ChevronLeft size={24} /></Link>
@@ -97,7 +118,13 @@ const OrderManagement = () => {
             <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', backgroundColor: 'var(--color-cream)', padding: '0.8rem 1.5rem', borderRadius: 'var(--radius-xl)', width: '350px', border: '1px solid rgba(122, 78, 58, 0.1)' }}>
                 <Search size={20} color="var(--color-brown)" />
-                <input type="text" placeholder="Search customer or order ID..." style={{ border: 'none', background: 'none', outline: 'none', width: '100%', fontSize: '1rem', fontWeight: 500 }} />
+                <input 
+                  type="text" 
+                  placeholder="Search customer or order ID..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ border: 'none', background: 'none', outline: 'none', width: '100%', fontSize: '1rem', fontWeight: 500 }} 
+                />
               </div>
               <button style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.8rem 1.5rem', background: 'white', border: '2px solid var(--color-cream)', borderRadius: 'var(--radius-xl)', fontWeight: 700, color: 'var(--color-brown)' }}>
                 <Filter size={20} /> Filter
@@ -121,7 +148,7 @@ const OrderManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.map(order => (
+              {filteredOrders.map(order => (
                 <tr key={order.id} style={{ borderBottom: '1px solid var(--color-cream)' }}>
                   <td style={{ padding: '1.8rem 2rem', fontWeight: 800, color: 'var(--color-pink)' }}>{order.id}</td>
                   <td style={{ padding: '1.8rem 1.5rem', fontWeight: 700, color: 'var(--color-brown-dark)' }}>{order.customer}</td>
@@ -146,9 +173,8 @@ const OrderManagement = () => {
                       }}
                     >
                       <option value="Placed">Placed</option>
-                      <option value="Payment Confirmed">Payment Confirmed</option>
+                      <option value="Confirmed">Confirmed</option>
                       <option value="Baking">Baking</option>
-                      <option value="Decorating">Decorating</option>
                       <option value="Out for Delivery">Out for Delivery</option>
                       <option value="Delivered">Delivered</option>
                       <option value="Cancelled">Cancelled</option>
@@ -167,7 +193,9 @@ const OrderManagement = () => {
                       {order.payment}
                     </span>
                   </td>
-                  <td style={{ padding: '1.8rem 1.5rem', fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-brown)' }}>{order.delivery}</td>
+                  <td style={{ padding: '1.8rem 1.5rem', fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-brown)' }}>
+                    {order.deliverySlot ? `${order.deliverySlot.date} (${order.deliverySlot.time})` : (order.delivery || 'N/A')}
+                  </td>
                   <td style={{ padding: '1.8rem 2rem', textAlign: 'right' }}>
                     <MoreVertical size={20} color="var(--color-brown)" cursor="pointer" opacity={0.5} />
                   </td>

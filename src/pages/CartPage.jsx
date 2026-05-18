@@ -6,15 +6,37 @@ import { Link } from 'react-router-dom';
 
 const CartPage = () => {
   const { cart, removeFromCart, updateQuantity, clearCart, subtotal } = useCart();
-  const [discount, setDiscount] = useState(0);
-  const [couponCode, setCouponCode] = useState('');
+  const [discount, setDiscount] = useState(() => {
+    try {
+      const activeCoupon = localStorage.getItem('cake_coupon');
+      return activeCoupon ? JSON.parse(activeCoupon).rate : 0;
+    } catch(e) {
+      return 0;
+    }
+  });
+  const [couponCode, setCouponCode] = useState(() => {
+    try {
+      const activeCoupon = localStorage.getItem('cake_coupon');
+      return activeCoupon ? JSON.parse(activeCoupon).code : '';
+    } catch(e) {
+      return '';
+    }
+  });
 
   const handleApplyCoupon = () => {
-    if (couponCode.trim()) {
-      alert(`Coupon code "${couponCode}" applied successfully! 10% discount added.`);
+    const code = couponCode.trim().toUpperCase();
+    if (code === 'WELCOME10') {
+      alert(`Coupon code "${code}" applied successfully! 10% discount added.`);
       setDiscount(0.1);
+      localStorage.setItem('cake_coupon', JSON.stringify({ code: 'WELCOME10', rate: 0.1 }));
+    } else if (code === 'FESTIVE20') {
+      alert(`Coupon code "${code}" applied successfully! 20% discount added.`);
+      setDiscount(0.2);
+      localStorage.setItem('cake_coupon', JSON.stringify({ code: 'FESTIVE20', rate: 0.2 }));
     } else {
-      alert("Please enter a valid coupon code.");
+      alert("Invalid coupon code. Try 'WELCOME10' or 'FESTIVE20'.");
+      setDiscount(0);
+      localStorage.removeItem('cake_coupon');
     }
   };
 

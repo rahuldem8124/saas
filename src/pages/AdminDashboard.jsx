@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { LayoutDashboard, ShoppingBag, Users, DollarSign, BarChart2, Truck, Ticket, Settings as SettingsIcon, TrendingUp, Package, ChevronRight, MoreVertical, Eye } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -8,27 +8,57 @@ const AdminDashboard = () => {
   const { switchRole } = useAuth();
   const location = useLocation();
   
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('cake_orders') || '[]');
+      if (stored.length === 0) {
+        // Seed some beautiful demo orders so the dashboard stats are filled out at start
+        const initial = [
+          { id: "CF-1024", customer: "Alice Green", cake: "Velvet Rose Dream", amount: "$45.00", status: "Baking", payment: "Paid", date: "May 18, 2026", deliverySlot: { date: "2026-05-19", time: "Afternoon" }, address: "123 Cherry Rd, Sweet City, NY", email: "alice@example.com", items: [{ name: "Velvet Rose Dream", price: "$45.00", weight: "1kg", quantity: 1, image: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&w=50&q=80" }] },
+          { id: "CF-1023", customer: "Bob Smith", cake: "Chocolate Truffle", amount: "$38.00", status: "Out for Delivery", payment: "Paid", date: "May 18, 2026", deliverySlot: { date: "2026-05-19", time: "Afternoon" }, address: "456 Maple St, Sweet City, NY", email: "bob@example.com", items: [{ name: "Chocolate Truffle", price: "$38.00", weight: "1kg", quantity: 1, image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=50&q=80" }] },
+          { id: "CF-1022", customer: "Charlie Brown", cake: "Lemon Zest Bliss", amount: "$42.00", status: "Placed", payment: "Pending", date: "May 18, 2026", deliverySlot: { date: "2026-05-20", time: "Morning" }, address: "789 Pine Ave, Sweet City, NY", email: "charlie@example.com", items: [{ name: "Lemon Zest Bliss", price: "$42.00", weight: "1kg", quantity: 1, image: "https://images.unsplash.com/photo-1519340333755-5672c2393a83?auto=format&fit=crop&w=50&q=80" }] }
+        ];
+        localStorage.setItem('cake_orders', JSON.stringify(initial));
+        setOrders(initial);
+      } else {
+        setOrders(stored);
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  }, []);
+
+  // Compute dynamic stats
+  const totalRevenue = orders.reduce((sum, o) => sum + parseFloat(o.amount.replace('$', '') || 0), 0);
+  const pendingCount = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length;
+  const completedCount = orders.filter(o => o.status === 'Delivered').length;
+
   const stats = [
-    { label: "Today's Orders", value: "24", icon: <ShoppingBag />, color: "rgba(242, 140, 163, 0.1)", trend: "+12%" },
-    { label: "Revenue", value: "$1,450", icon: <DollarSign />, color: "rgba(255, 214, 165, 0.15)", trend: "+8%" },
-    { label: "Pending Orders", value: "8", icon: <Package />, color: "rgba(122, 78, 58, 0.05)", trend: "-2%" },
-    { label: "Completed", value: "118", icon: <TrendingUp />, color: "rgba(232, 180, 184, 0.15)", trend: "+15%" },
+    { label: "Total Orders", value: orders.length.toString(), icon: <ShoppingBag />, color: "rgba(242, 140, 163, 0.1)", trend: "+15%" },
+    { label: "Revenue", value: `$${totalRevenue.toFixed(2)}`, icon: <DollarSign />, color: "rgba(255, 214, 165, 0.15)", trend: "+24%" },
+    { label: "Pending Orders", value: pendingCount.toString(), icon: <Package />, color: "rgba(122, 78, 58, 0.05)", trend: "-5%" },
+    { label: "Completed", value: completedCount.toString(), icon: <TrendingUp />, color: "rgba(232, 180, 184, 0.15)", trend: "+18%" },
   ];
 
-  const recentOrders = [
-    { id: "#1024", customer: "Alice Green", cake: "Velvet Rose Dream", amount: "$45", status: "Baking", date: "2 mins ago" },
-    { id: "#1023", customer: "Bob Smith", cake: "Chocolate Truffle", amount: "$38", status: "Out for Delivery", date: "15 mins ago" },
-    { id: "#1022", customer: "Charlie Brown", cake: "Lemon Zest Bliss", amount: "$42", status: "Placed", date: "1 hour ago" },
-    { id: "#1021", customer: "Diana Prince", cake: "Berry Vanilla", amount: "$50", status: "Delivered", date: "3 hours ago" },
-  ];
+  // Limit to 4 recent orders
+  const recentOrders = orders.slice(0, 4);
 
   const handleDownloadReport = () => {
-    const reportContent = "CakeFlow Admin Report\n\nGenerated on: " + new Date().toLocaleString() + "\n\nTotal Orders: 24\nRevenue: $1,450\nPending Orders: 8";
+    const reportContent = `CakeFlow Admin Operating Report\n` +
+      `===============================\n` +
+      `Generated on: ${new Date().toLocaleString()}\n\n` +
+      `Total Orders Listed: ${orders.length}\n` +
+      `Total Estimated Revenue: $${totalRevenue.toFixed(2)}\n` +
+      `Pending Orders Count: ${pendingCount}\n` +
+      `Completed Deliveries: ${completedCount}\n`;
+    
     const blob = new Blob([reportContent], { type: "text/plain;charset=utf-8" });
     const encodedUri = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "cakeflow_report.txt");
+    link.setAttribute("download", `cakeflow_report_${Date.now()}.txt`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -95,7 +125,7 @@ const AdminDashboard = () => {
 
           <div style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid rgba(122, 78, 58, 0.1)' }}>
             <Link 
-              to="/" 
+              to="/home" 
               onClick={() => switchRole('user')}
               style={{
                 display: 'flex',
@@ -139,7 +169,7 @@ const AdminDashboard = () => {
             >
               <div>
                 <div style={{ color: 'var(--color-brown)', fontSize: '1rem', fontWeight: 600, marginBottom: '0.8rem' }}>{stat.label}</div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--color-brown-dark)' }}>{stat.value}</div>
+                <div style={{ fontSize: '2.3rem', fontWeight: 900, color: 'var(--color-brown-dark)', wordBreak: 'break-all' }}>{stat.value}</div>
                 <div style={{ fontSize: '0.9rem', color: stat.trend.startsWith('+') ? '#4CAF50' : '#F44336', marginTop: '0.8rem', fontWeight: 700 }}>
                   {stat.trend} <span style={{ opacity: 0.6, fontWeight: 500 }}>from yesterday</span>
                 </div>
@@ -152,7 +182,8 @@ const AdminDashboard = () => {
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center',
-                color: 'var(--color-pink)'
+                color: 'var(--color-pink)',
+                flexShrink: 0
               }}>
                 {stat.icon}
               </div>
@@ -193,8 +224,8 @@ const AdminDashboard = () => {
                         borderRadius: '20px',
                         fontSize: '0.85rem',
                         fontWeight: 800,
-                        backgroundColor: order.status === 'Delivered' ? 'rgba(76, 175, 80, 0.1)' : order.status === 'Baking' ? 'rgba(255, 152, 0, 0.1)' : 'rgba(33, 150, 243, 0.1)',
-                        color: order.status === 'Delivered' ? '#2E7D32' : order.status === 'Baking' ? '#E65100' : '#1565C0'
+                        backgroundColor: order.status === 'Delivered' ? 'rgba(76, 175, 80, 0.1)' : order.status === 'Baking' ? 'rgba(255, 152, 0, 0.1)' : order.status === 'Out for Delivery' ? 'rgba(33, 150, 243, 0.1)' : 'rgba(122, 78, 58, 0.05)',
+                        color: order.status === 'Delivered' ? '#2E7D32' : order.status === 'Baking' ? '#E65100' : order.status === 'Out for Delivery' ? '#1565C0' : 'var(--color-brown)'
                       }}>
                         {order.status}
                       </span>

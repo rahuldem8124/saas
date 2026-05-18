@@ -1,12 +1,45 @@
-import React, { useState } from 'react';
-import { Settings as SettingsIcon, LayoutDashboard, ShoppingBag, Package, Users, DollarSign, BarChart2, Truck, Ticket, Eye, User, Bell, Shield, Store, Save } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Settings as SettingsIcon, LayoutDashboard, ShoppingBag, Package, Users, DollarSign, BarChart2, Truck, Ticket, Eye, User, Bell, Shield, Store, Save, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const AdminSettings = () => {
   const { switchRole } = useAuth();
-  const [activeTab, setActiveTab] = useState('Bakery Profile');
+  const [activeTab, setActiveTab] = useState('Bakery Config');
   
+  // Custom states that dynamically map to checkout calculations
+  const [settings, setSettings] = useState({
+    bakeryName: 'CakeFlow Artisanal',
+    email: 'hello@cakeflow.com',
+    address: '123 Pastry Lane, Sweet Hills, NY 10001',
+    businessHours: '09:00 AM - 08:00 PM',
+    deliveryFee: '10.00',
+    freeDeliveryLimit: '50.00',
+    whatsappLink: 'https://wa.me/15550199',
+    instagramLink: 'https://instagram.com/cakeflow_bakery'
+  });
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('cake_settings');
+      if (saved) {
+        setSettings(JSON.parse(saved));
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  }, []);
+
+  const handleSaveSettings = (e) => {
+    e.preventDefault();
+    try {
+      localStorage.setItem('cake_settings', JSON.stringify(settings));
+      alert('Bakery parameters saved and synced across all pages!');
+    } catch(err) {
+      console.error(err);
+    }
+  };
+
   const navItems = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin' },
     { name: 'Orders', icon: <ShoppingBag size={20} />, path: '/admin/orders' },
@@ -21,7 +54,9 @@ const AdminSettings = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream)' }}>
-      <aside style={{ width: '280px', backgroundColor: 'var(--color-white)', borderRight: '1px solid rgba(122, 78, 58, 0.1)', padding: '2.5rem 1.5rem', position: 'fixed', height: '100vh', boxSizing: 'border-box', zIndex: 1100, display: 'flex', flexDirection: 'column' }}>
+      
+      {/* Sidebar */}
+      <aside className="admin-sidebar" style={{ width: '280px', backgroundColor: 'var(--color-white)', borderRight: '1px solid rgba(122, 78, 58, 0.1)', padding: '2.5rem 1.5rem', position: 'fixed', height: '100vh', boxSizing: 'border-box', zIndex: 1100, display: 'flex', flexDirection: 'column' }}>
         <div style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 'bold', marginBottom: '2.5rem', color: 'var(--color-brown-dark)' }}>
           CakeFlow <span style={{ fontSize: '0.9rem', color: 'var(--color-pink)', fontWeight: 800 }}>ADMIN</span>
         </div>
@@ -50,17 +85,18 @@ const AdminSettings = () => {
         </nav>
       </aside>
 
-      <main style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
+      {/* Main Panel */}
+      <main className="admin-main" style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
         <header style={{ marginBottom: '4rem' }}>
           <h1 style={{ fontSize: '3rem', fontWeight: 800 }}>System Settings</h1>
-          <p style={{ color: 'var(--color-brown)', fontSize: '1.1rem', opacity: 0.8 }}>Configure your bakery's preferences and security.</p>
+          <p style={{ color: 'var(--color-brown)', fontSize: '1.1rem', opacity: 0.8 }}>Configure your bakery's preferences, delivery fees, and limits.</p>
         </header>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2.5fr', gap: '3rem' }}>
           {/* Settings Tabs */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {[
-              { label: 'Bakery Profile', icon: <Store size={20} /> },
+              { label: 'Bakery Config', icon: <Store size={20} /> },
               { label: 'Notifications', icon: <Bell size={20} /> },
               { label: 'Security', icon: <Shield size={20} /> },
               { label: 'Team Access', icon: <User size={20} /> },
@@ -89,46 +125,50 @@ const AdminSettings = () => {
           <div className="card" style={{ padding: '3rem', background: 'white' }}>
             <h3 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '2.5rem' }}>{activeTab}</h3>
             
-            {activeTab === 'Bakery Profile' && (
-              <form style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {activeTab === 'Bakery Config' && (
+              <form onSubmit={handleSaveSettings} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                   <div className="form-group">
                     <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 700 }}>Bakery Name</label>
-                    <input type="text" defaultValue="CakeFlow Artisanal" style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none' }} />
+                    <input type="text" value={settings.bakeryName} onChange={e => setSettings({...settings, bakeryName: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none', boxSizing: 'border-box' }} required />
                   </div>
                   <div className="form-group">
                     <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 700 }}>Contact Email</label>
-                    <input type="email" defaultValue="hello@cakeflow.com" style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none' }} />
+                    <input type="email" value={settings.email} onChange={e => setSettings({...settings, email: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none', boxSizing: 'border-box' }} required />
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 700 }}>Business Address</label>
-                  <textarea defaultValue="123 Pastry Lane, Sweet Hills, NY 10001" rows="3" style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none', resize: 'none' }}></textarea>
+                  <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 700 }}>Instagram Profile Link</label>
+                  <input type="text" value={settings.instagramLink} onChange={e => setSettings({...settings, instagramLink: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none', boxSizing: 'border-box' }} required />
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                   <div className="form-group">
-                    <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 700 }}>Currency</label>
-                    <select style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none' }}>
-                      <option>USD ($)</option>
-                      <option>EUR (€)</option>
-                      <option>GBP (£)</option>
-                    </select>
+                    <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 700 }}>Business Hours</label>
+                    <input type="text" value={settings.businessHours} onChange={e => setSettings({...settings, businessHours: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none', boxSizing: 'border-box' }} required />
                   </div>
                   <div className="form-group">
-                    <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 700 }}>Timezone</label>
-                    <select style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none' }}>
-                      <option>Eastern Time (ET)</option>
-                      <option>Pacific Time (PT)</option>
-                      <option>UTC</option>
-                    </select>
+                    <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 700 }}>WhatsApp Channel Link</label>
+                    <input type="text" value={settings.whatsappLink} onChange={e => setSettings({...settings, whatsappLink: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none', boxSizing: 'border-box' }} required />
                   </div>
                 </div>
 
-                <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-                  <button type="button" onClick={() => alert('Settings saved successfully!')} className="btn-primary" style={{ padding: '1rem 3rem', display: 'flex', alignItems: 'center', gap: '0.8rem', fontSize: '1.1rem', cursor: 'pointer', border: 'none', borderRadius: '12px' }}>
-                    <Save size={20} /> Save Changes
+                {/* Delivery pricing parameters */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', background: 'var(--color-cream)', padding: '2rem', borderRadius: '20px' }}>
+                  <div className="form-group">
+                    <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 800, color: 'var(--color-brown-dark)' }}>Standard Delivery Fee ($)</label>
+                    <input type="number" min="0" step="0.5" value={settings.deliveryFee} onChange={e => setSettings({...settings, deliveryFee: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid white', outline: 'none', boxSizing: 'border-box', fontWeight: 800 }} required />
+                  </div>
+                  <div className="form-group">
+                    <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 800, color: 'var(--color-brown-dark)' }}>Free Delivery Threshold ($)</label>
+                    <input type="number" min="0" step="1" value={settings.freeDeliveryLimit} onChange={e => setSettings({...settings, freeDeliveryLimit: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid white', outline: 'none', boxSizing: 'border-box', fontWeight: 800 }} required />
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
+                  <button type="submit" className="btn-primary" style={{ padding: '1rem 3rem', display: 'flex', alignItems: 'center', gap: '0.8rem', fontSize: '1.1rem', cursor: 'pointer', border: 'none', borderRadius: '12px', boxShadow: 'var(--shadow-glow)' }}>
+                    <Save size={20} /> Save Bakery Config
                   </button>
                 </div>
               </form>
@@ -149,11 +189,6 @@ const AdminSettings = () => {
                     <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 700 }}>Confirm New Password</label>
                     <input type="password" style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none' }} />
                   </div>
-                </div>
-                <div style={{ marginTop: '1rem' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer', fontWeight: 600 }}>
-                    <input type="checkbox" defaultChecked style={{ width: '18px', height: '18px' }} /> Enable Two-Factor Authentication (2FA)
-                  </label>
                 </div>
                 <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
                   <button type="button" onClick={() => alert('Security settings updated!')} className="btn-primary" style={{ padding: '1rem 3rem', display: 'flex', alignItems: 'center', gap: '0.8rem', fontSize: '1.1rem', cursor: 'pointer', border: 'none', borderRadius: '12px' }}>
@@ -208,7 +243,7 @@ const AdminSettings = () => {
                   </label>
                 ))}
                 <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-                  <button type="button" onClick={() => alert('Notification settings saved!')} className="btn-primary" style={{ padding: '1rem 3rem', display: 'flex', alignItems: 'center', gap: '0.8rem', fontSize: '1.1rem', cursor: 'pointer', border: 'none', borderRadius: '12px' }}>
+                  <button type="button" onClick={() => alert('Notification preferences saved!')} className="btn-primary" style={{ padding: '1rem 3rem', display: 'flex', alignItems: 'center', gap: '0.8rem', fontSize: '1.1rem', cursor: 'pointer', border: 'none', borderRadius: '12px' }}>
                     <Bell size={20} /> Save Preferences
                   </button>
                 </div>

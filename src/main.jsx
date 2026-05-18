@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.jsx'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
+import { FavoritesProvider } from './context/FavoritesContext'
 
 const rootElement = document.getElementById('root');
 if (rootElement) {
@@ -13,7 +14,9 @@ if (rootElement) {
       <Router>
         <AuthProvider>
           <CartProvider>
-            <App />
+            <FavoritesProvider>
+              <App />
+            </FavoritesProvider>
           </CartProvider>
         </AuthProvider>
       </Router>

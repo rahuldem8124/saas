@@ -23,10 +23,11 @@ export const CartProvider = ({ children }) => {
   const addToCart = (item) => {
     setCart(prev => {
       const existing = prev.find(i => i.id === item.id);
+      const qtyToAdd = item.quantity || 1;
       if (existing) {
-        return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+        return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + qtyToAdd } : i);
       }
-      return [...prev, { ...item, quantity: 1 }];
+      return [...prev, { ...item, quantity: qtyToAdd }];
     });
     
     // Show toast

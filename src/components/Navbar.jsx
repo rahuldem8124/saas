@@ -3,7 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Search, ShoppingBag, User as UserIcon, Menu, X, Shield, Home, Grid, MapPin } from 'lucide-react';
+import { useFavorites } from '../context/FavoritesContext';
+import { Search, ShoppingBag, User as UserIcon, Menu, X, Shield, Home, Grid, MapPin, Heart } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +12,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const { cartCount } = useCart();
   const { isAdmin } = useAuth();
+  const { favorites } = useFavorites();
   const location = useLocation();
 
   useEffect(() => {
@@ -136,6 +138,33 @@ const Navbar = () => {
             )}
           </Link>
           
+          <Link to="/favorites" className="hide-on-mobile" style={{ position: 'relative' }}>
+            <Heart size={26} color="var(--color-brown-dark)" />
+            {favorites.length > 0 && (
+              <motion.span 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  background: 'var(--color-pink)',
+                  color: 'white',
+                  fontSize: '0.7rem',
+                  fontWeight: 900,
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'var(--shadow-glow)'
+                }}>
+                {favorites.length}
+              </motion.span>
+            )}
+          </Link>
+          
           <Link to="/profile" className="hide-on-mobile">
             <UserIcon size={26} color="var(--color-brown-dark)" />
           </Link>
@@ -200,7 +229,7 @@ const Navbar = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {[...navLinks, { name: 'My Profile', path: '/profile' }, { name: 'Order Tracking', path: '/tracking' }].map(link => (
+                {[...navLinks, { name: 'My Profile', path: '/profile' }, { name: 'My Favorites', path: '/favorites' }, { name: 'Order Tracking', path: '/tracking' }].map(link => (
                   <Link 
                     key={link.name} 
                     to={link.path} 

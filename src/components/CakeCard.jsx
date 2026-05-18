@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Star, Plus, Heart, Clock, PenTool } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useFavorites } from '../context/FavoritesContext';
 
 const CakeCard = ({ cake }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
   const { addToCart } = useCart();
 
   const handleQuickAdd = (e) => {
@@ -17,6 +18,8 @@ const CakeCard = ({ cake }) => {
       quantity: 1
     });
   };
+
+  const isFav = isFavorite(cake.id);
 
   return (
     <motion.div 
@@ -35,7 +38,7 @@ const CakeCard = ({ cake }) => {
       }}>
         <button 
           className="touch-friendly"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsFavorite(!isFavorite); }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleFavorite(cake); }}
           style={{
             background: 'rgba(255, 255, 255, 0.95)',
             padding: '0.6rem',
@@ -46,7 +49,7 @@ const CakeCard = ({ cake }) => {
             cursor: 'pointer'
           }}
         >
-          <Heart size={18} fill={isFavorite ? "var(--color-pink)" : "none"} color={isFavorite ? "var(--color-pink)" : "var(--color-brown-dark)"} />
+          <Heart size={18} fill={isFav ? "var(--color-pink)" : "none"} color={isFav ? "var(--color-pink)" : "var(--color-brown-dark)"} />
         </button>
       </div>
 

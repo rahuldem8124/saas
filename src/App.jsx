@@ -23,6 +23,8 @@ import ExclusivesPage from './pages/ExclusivesPage';
 import CustomPage from './pages/CustomPage';
 import ProfilePage from './pages/ProfilePage';
 import AboutPage from './pages/AboutPage';
+import FavoritesPage from './pages/FavoritesPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Simple placeholder components for missing pages
 const ContactPage = () => <div style={{ padding: '120px 5%' }}><h1>Contact Us</h1><p>Email: hello@cakeflow.com</p></div>;
@@ -62,17 +64,18 @@ function App() {
           <Route path="/tracking" element={<TrackingPage />} />
           <Route path="/tracking/:id" element={<TrackingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/favorites" element={<FavoritesPage />} />
           
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/orders" element={<OrderManagement />} />
-          <Route path="/admin/customers" element={<AdminCustomers />} />
-          <Route path="/admin/payments" element={<AdminPayments />} />
-          <Route path="/admin/products" element={<AdminProducts />} />
-          <Route path="/admin/analytics" element={<AdminAnalytics />} />
-          <Route path="/admin/delivery" element={<AdminDelivery />} />
-          <Route path="/admin/coupons" element={<AdminCoupons />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
+          {/* Admin Routes protected with ProtectedRoute wrapper */}
+          <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/orders" element={<ProtectedRoute><OrderManagement /></ProtectedRoute>} />
+          <Route path="/admin/customers" element={<ProtectedRoute><AdminCustomers /></ProtectedRoute>} />
+          <Route path="/admin/payments" element={<ProtectedRoute><AdminPayments /></ProtectedRoute>} />
+          <Route path="/admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
+          <Route path="/admin/analytics" element={<ProtectedRoute><AdminAnalytics /></ProtectedRoute>} />
+          <Route path="/admin/delivery" element={<ProtectedRoute><AdminDelivery /></ProtectedRoute>} />
+          <Route path="/admin/coupons" element={<ProtectedRoute><AdminCoupons /></ProtectedRoute>} />
+          <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
           
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
