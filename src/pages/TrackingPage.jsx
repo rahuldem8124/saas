@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Check, Clock, Package, Truck, Home, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const TrackingPage = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 767);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const steps = [
     { name: 'Order Placed', icon: <Package size={24} />, status: 'completed', time: '10:30 AM' },
     { name: 'Payment Confirmed', icon: <Check size={24} />, status: 'completed', time: '10:35 AM' },
@@ -38,35 +46,45 @@ const TrackingPage = () => {
       <section className="card" style={{ padding: '5rem 3rem', marginBottom: '4rem', background: 'white', position: 'relative', overflow: 'hidden' }}>
         <div style={{ 
           display: 'flex', 
+          flexDirection: isMobile ? 'column' : 'row',
           justifyContent: 'space-between', 
+          gap: isMobile ? '3rem' : '0',
           position: 'relative',
-          padding: '0 1rem'
+          padding: isMobile ? '0' : '0 1rem'
         }}>
           {/* Timeline Line */}
           <div style={{
             position: 'absolute',
-            top: '30px',
-            left: '5rem',
-            right: '5rem',
-            height: '6px',
+            top: isMobile ? '0' : '30px',
+            bottom: isMobile ? '0' : 'auto',
+            left: isMobile ? '31px' : '5rem',
+            right: isMobile ? 'auto' : '5rem',
+            height: isMobile ? '100%' : '6px',
+            width: isMobile ? '6px' : 'auto',
             backgroundColor: 'var(--color-cream)',
             zIndex: 0,
             borderRadius: '10px'
           }}>
             <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: '50%' }}
+              initial={isMobile ? { height: 0 } : { width: 0 }}
+              animate={isMobile ? { height: '50%' } : { width: '50%' }}
               transition={{ duration: 2, ease: "easeInOut" }}
-              style={{ height: '100%', background: 'var(--gradient-pink)', borderRadius: '10px', boxShadow: 'var(--shadow-glow)' }}
+              style={{ 
+                height: isMobile ? '0%' : '100%', 
+                width: isMobile ? '100%' : '0%', 
+                background: 'var(--gradient-pink)', 
+                borderRadius: '10px', 
+                boxShadow: 'var(--shadow-glow)' 
+              }}
             ></motion.div>
           </div>
 
           {steps.map((step, index) => (
             <div key={index} style={{ 
               display: 'flex', 
-              flexDirection: 'column', 
-              alignItems: 'center', 
-              gap: '2rem',
+              flexDirection: isMobile ? 'row' : 'column', 
+              alignItems: isMobile ? 'flex-start' : 'center', 
+              gap: isMobile ? '1.5rem' : '2rem',
               zIndex: 1,
               flex: 1
             }}>
@@ -88,7 +106,7 @@ const TrackingPage = () => {
               >
                 {step.icon}
               </motion.div>
-              <div style={{ textAlign: 'center' }}>
+              <div style={{ textAlign: isMobile ? 'left' : 'center', paddingTop: isMobile ? '0.5rem' : '0' }}>
                 <div style={{ fontWeight: 800, fontSize: '1.1rem', color: step.status === 'upcoming' ? 'var(--color-brown-light)' : 'var(--color-brown-dark)' }}>{step.name}</div>
                 <div style={{ 
                   fontSize: '0.9rem', 

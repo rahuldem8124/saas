@@ -22,7 +22,7 @@ const CheckoutPage = () => {
     <div style={{ padding: '60px 5% 6rem', maxWidth: '1300px', margin: '0 auto' }}>
       <h1 style={{ fontSize: '3.5rem', marginBottom: '3.5rem', fontWeight: 800, color: 'var(--color-brown-dark)', marginTop: '40px' }}>Checkout</h1>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '5rem', alignItems: 'start' }}>
+      <div className="cart-grid">
         
         {/* Left Side: Forms */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
@@ -102,7 +102,7 @@ const CheckoutPage = () => {
         </div>
 
         {/* Right Side: Summary */}
-        <aside>
+        <aside className="mobile-sticky-summary">
           <div className="card" style={{ position: 'sticky', top: '120px', padding: '3rem', background: 'white', boxShadow: 'var(--shadow-medium)' }}>
             <h3 style={{ marginBottom: '2.5rem', fontSize: '1.8rem', fontWeight: 800 }}>Order Summary</h3>
             

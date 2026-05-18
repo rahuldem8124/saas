@@ -34,6 +34,7 @@ const CakeCard = ({ cake }) => {
         gap: '0.5rem'
       }}>
         <button 
+          className="touch-friendly"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsFavorite(!isFavorite); }}
           style={{
             background: 'rgba(255, 255, 255, 0.95)',
@@ -101,7 +102,7 @@ const CakeCard = ({ cake }) => {
             {cake.price}
           </div>
           <div style={{ display: 'flex', gap: '0.8rem' }}>
-            <Link to="/custom" style={{ 
+            <Link to="/custom" className="touch-friendly" style={{ 
               width: '45px', 
               height: '45px', 
               borderRadius: '15px', 
@@ -118,7 +119,7 @@ const CakeCard = ({ cake }) => {
             <motion.button 
               whileTap={{ scale: 0.9 }}
               onClick={handleQuickAdd}
-              className="btn-primary" 
+              className="btn-primary touch-friendly" 
               style={{ 
                 padding: '0 1.5rem', 
                 height: '45px',

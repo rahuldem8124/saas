@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Search, ShoppingBag, User as UserIcon, Menu, X, Shield } from 'lucide-react';
+import { Search, ShoppingBag, User as UserIcon, Menu, X, Shield, Home, Grid, MapPin } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,7 +24,7 @@ const Navbar = () => {
   }, [location]);
 
   const navLinks = [
-    { name: 'Home', path: '/home' },
+    { name: 'Home', path: '/' },
     { name: 'Birthday', path: '/birthday' },
     { name: 'Wedding', path: '/wedding' },
     { name: 'Exclusives', path: '/exclusives' },
@@ -50,7 +50,7 @@ const Navbar = () => {
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
       }}>
         <div className="nav-left" style={{ display: 'flex', alignItems: 'center', gap: '3rem' }}>
-          <Link to="/home" style={{ 
+          <Link to="/" style={{ 
             fontFamily: 'var(--font-heading)', 
             fontSize: '2.2rem', 
             fontWeight: 900, 
@@ -61,7 +61,7 @@ const Navbar = () => {
             CakeFlow<span style={{ color: 'var(--color-pink)' }}>.</span>
           </Link>
           
-          <div className="desktop-only" style={{ display: 'flex', gap: '2.5rem' }}>
+          <div className="hide-on-mobile" style={{ display: 'flex', gap: '2.5rem' }}>
             {navLinks.map(link => (
               <Link key={link.name} to={link.path} className="nav-link" style={{ 
                 fontWeight: 800, 
@@ -79,7 +79,7 @@ const Navbar = () => {
 
         <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           {/* Animated Search Bar */}
-          <div className="desktop-only" style={{ 
+          <div className="hide-on-mobile" style={{ 
             position: 'relative', 
             display: 'flex', 
             alignItems: 'center',
@@ -109,7 +109,7 @@ const Navbar = () => {
             />
           </div>
 
-          <Link to="/cart" style={{ position: 'relative' }}>
+          <Link to="/cart" style={{ position: 'relative' }} className="hide-on-mobile">
             <ShoppingBag size={26} color="var(--color-brown-dark)" />
             {cartCount > 0 && (
               <motion.span 
@@ -136,12 +136,12 @@ const Navbar = () => {
             )}
           </Link>
           
-          <Link to="/profile" className="desktop-only">
+          <Link to="/profile" className="hide-on-mobile">
             <UserIcon size={26} color="var(--color-brown-dark)" />
           </Link>
 
           {isAdmin && (
-            <Link to="/admin" className="desktop-only" style={{ 
+            <Link to="/admin" className="hide-on-mobile" style={{ 
               fontWeight: 900, 
               color: 'white',
               background: 'var(--gradient-pink)',
@@ -238,6 +238,35 @@ const Navbar = () => {
           .mobile-only { display: block; }
         }
       `}</style>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="mobile-bottom-nav">
+        <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
+          <Home size={22} />
+          <span>Home</span>
+        </Link>
+        <Link to="/exclusives" className={location.pathname === '/exclusives' ? 'active' : ''}>
+          <Grid size={22} />
+          <span>Categories</span>
+        </Link>
+        <Link to="/cart" className={location.pathname === '/cart' ? 'active' : ''} style={{ position: 'relative' }}>
+          <ShoppingBag size={22} />
+          <span>Cart</span>
+          {cartCount > 0 && (
+            <span style={{ position: 'absolute', top: '-5px', right: '15px', background: 'var(--color-pink)', color: 'white', fontSize: '0.6rem', fontWeight: 900, width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {cartCount}
+            </span>
+          )}
+        </Link>
+        <Link to="/tracking" className={location.pathname === '/tracking' ? 'active' : ''}>
+          <MapPin size={22} />
+          <span>Track</span>
+        </Link>
+        <Link to="/profile" className={location.pathname === '/profile' ? 'active' : ''}>
+          <UserIcon size={22} />
+          <span>Profile</span>
+        </Link>
+      </div>
     </>
   );
 };

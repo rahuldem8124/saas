@@ -18,7 +18,7 @@ const CustomCakeForm = () => {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', marginTop: '2rem' }}>
+    <div className="cart-grid" style={{ marginTop: '2rem' }}>
       {/* Form Side */}
       <motion.div 
         initial={{ opacity: 0, x: -20 }}
@@ -29,7 +29,7 @@ const CustomCakeForm = () => {
         <h2 style={{ fontSize: '2rem', marginBottom: '2.5rem', fontWeight: 800, color: 'var(--color-brown-dark)' }}>Design Your Dream Cake</h2>
         
         <form style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div className="custom-form-row">
             <div className="form-group">
               <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 700, fontSize: '0.9rem' }}>Occasion</label>
               <select name="occasion" className="form-input" onChange={handleChange} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none' }}>
@@ -50,7 +50,7 @@ const CustomCakeForm = () => {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div className="custom-form-row">
             <div className="form-group">
               <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 700, fontSize: '0.9rem' }}>Weight</label>
               <select name="weight" className="form-input" onChange={handleChange} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none' }}>

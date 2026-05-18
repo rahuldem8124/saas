@@ -56,7 +56,7 @@ const AdminDashboard = () => {
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream)' }}>
       
       {/* Sidebar */}
-      <aside style={{ 
+      <aside className="admin-sidebar" style={{ 
         width: '280px', 
         backgroundColor: 'var(--color-white)', 
         borderRight: '1px solid rgba(122, 78, 58, 0.1)',
@@ -95,7 +95,7 @@ const AdminDashboard = () => {
 
           <div style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid rgba(122, 78, 58, 0.1)' }}>
             <Link 
-              to="/home" 
+              to="/" 
               onClick={() => switchRole('user')}
               style={{
                 display: 'flex',
@@ -116,7 +116,7 @@ const AdminDashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
+      <main className="admin-main" style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
           <div>
             <h1 style={{ fontSize: '3rem', marginBottom: '0.5rem', fontWeight: 800 }}>Bakery Dashboard</h1>
@@ -129,7 +129,7 @@ const AdminDashboard = () => {
         </header>
 
         {/* Stats Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2.5rem', marginBottom: '4rem' }}>
+        <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2.5rem', marginBottom: '4rem' }}>
           {stats.map((stat, i) => (
             <motion.div 
               key={i}
@@ -160,7 +160,7 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '3rem' }}>
+        <div className="admin-grid-2" style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '3rem' }}>
           
           {/* Recent Orders Table */}
           <div className="card" style={{ padding: '2.5rem', background: 'white' }}>
@@ -168,7 +168,8 @@ const AdminDashboard = () => {
               <h3 style={{ fontSize: '1.8rem', fontWeight: 800 }}>Recent Orders</h3>
               <Link to="/admin/orders" style={{ color: 'var(--color-pink)', fontWeight: 800, fontSize: '1rem' }}>View All Orders →</Link>
             </div>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className="table-responsive">
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ textAlign: 'left', borderBottom: '2px solid var(--color-cream)' }}>
                   <th style={{ padding: '1.2rem 0', color: 'var(--color-brown)', fontWeight: 700 }}>Customer</th>
@@ -205,7 +206,8 @@ const AdminDashboard = () => {
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
           </div>
 
           {/* Visuals Section */}

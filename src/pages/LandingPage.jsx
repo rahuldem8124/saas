@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, useScroll, useTransform, useVelocity, useSpring, useMotionTemplate } from 'framer-motion';
 import { Star, Truck, Heart, Palette, ChevronRight, Camera as IgIcon, MessageCircle, Play, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CakeCard from '../components/CakeCard';
@@ -14,34 +14,62 @@ const LandingPage = () => {
     { id: 4, name: "Berry Vanilla Spark", price: "$50", rating: 5.0, image: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=400&q=80" },
   ];
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
+  
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 767);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const { scrollY } = useScroll();
+  
+  // Advanced Scroll Physics
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(scrollVelocity, { damping: 50, stiffness: 400 });
+  
+  // Parallax Lag (Y offset) & Curved Path (X offset)
+  const velocityYOffset = useTransform(smoothVelocity, [-1000, 0, 1000], [60, 0, -60]);
+  const pathX = useTransform(scrollY, [0, 1000, 2000, 3000], [0, -50, 30, -20]);
+  
+  // Bouncing/Slowing near sections (approximate pixel heights)
+  const sectionBounceY = useTransform(scrollY, [0, 700, 800, 1500, 1600], [0, 0, -25, 0, -25]);
+  
+  // Velocity Transformations (Tilt, Scale, Blur)
+  const tilt = useTransform(smoothVelocity, [-1000, 0, 1000], isMobile ? [0, 0, 0] : [-12, 0, 12]);
+  const velocityScale = useTransform(smoothVelocity, [-1000, 0, 1000], isMobile ? [1, 1, 1] : [0.92, 1, 0.92]);
+  const blurAmount = useTransform(smoothVelocity, [-1500, 0, 1500], isMobile ? [0, 0, 0] : [3, 0, 3]);
+  const blurFilter = useMotionTemplate`blur(${blurAmount}px)`;
+  
+  // Fade in/out
+  const pastryOpacity = useTransform(scrollY, [0, 300, 2500, 3000], [0, 1, 1, 0]);
+
+  // Sprinkle Trail Physics (Lagging behind main path)
+  const sprinkleX1 = useSpring(pathX, { stiffness: 40, damping: 25 });
+  const sprinkleY1 = useSpring(velocityYOffset, { stiffness: 40, damping: 25 });
+  const sprinkleX2 = useSpring(pathX, { stiffness: 25, damping: 15 });
+  const sprinkleY2 = useSpring(velocityYOffset, { stiffness: 25, damping: 15 });
+  const sprinkleX3 = useSpring(pathX, { stiffness: 60, damping: 30 });
+  const sprinkleY3 = useSpring(velocityYOffset, { stiffness: 60, damping: 30 });
+
+  // Drips
   const dripY1 = useTransform(scrollY, [0, 800], [0, 200]);
   const dripY2 = useTransform(scrollY, [0, 1000], [0, 280]);
   const dripY3 = useTransform(scrollY, [0, 600], [0, 150]);
-  const pastryOpacity = useTransform(scrollY, [0, 2500, 3000], [1, 1, 0]);
 
   return (
     <div className="landing-page">
       {/* Hero Section Refined */}
-      <section style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        padding: '120px 5% 60px',
-        background: 'var(--color-cream)',
-        position: 'relative',
-        overflow: 'hidden',
-        boxSizing: 'border-box'
-      }}>
+      <section className="hero-container">
         {/* Background Decorative Elements */}
         <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '600px', height: '600px', background: 'rgba(242, 140, 163, 0.08)', borderRadius: '50%', filter: 'blur(80px)' }}></div>
         <div style={{ position: 'absolute', bottom: '10%', left: '-5%', width: '400px', height: '400px', background: 'rgba(255, 214, 165, 0.15)', borderRadius: '50%', filter: 'blur(60px)' }}></div>
 
         <motion.div 
+          className="hero-text"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          style={{ width: '55%', zIndex: 1 }}
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -71,7 +99,7 @@ const LandingPage = () => {
             Elevate your celebrations with CakeFlow's artisanal creations. From Instagram-worthy designs to heavenly flavors, we deliver perfection.
           </p>
           <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-            <Link to="/home" className="btn-primary" style={{ fontSize: '1.2rem', padding: '1.2rem 3.5rem', boxShadow: 'var(--shadow-glow)' }}>Start Your Order</Link>
+            <Link to="/birthday" className="btn-primary" style={{ fontSize: '1.2rem', padding: '1.2rem 3.5rem', boxShadow: 'var(--shadow-glow)' }}>Start Your Order</Link>
             <Link to="/wedding" style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontWeight: 800, color: 'var(--color-brown-dark)', fontSize: '1.1rem' }}>
               <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-soft)' }}>
                 <Play size={20} fill="var(--color-pink)" color="var(--color-pink)" />
@@ -82,10 +110,10 @@ const LandingPage = () => {
         </motion.div>
 
         <motion.div 
+          className="hero-image"
           initial={{ opacity: 0, scale: 0.8, x: 100 }}
           animate={{ opacity: 1, scale: 1, x: 0 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          style={{ width: '45%', position: 'relative', display: 'flex', justifyContent: 'center' }}
         >
           <motion.div 
             animate={{ 
@@ -146,7 +174,7 @@ const LandingPage = () => {
             <h2 style={{ fontSize: '4rem', fontWeight: 900, marginBottom: '0.5rem' }}>Our Signature Treats</h2>
             <p style={{ color: 'var(--color-brown)', fontSize: '1.2rem', fontWeight: 600, opacity: 0.7 }}>Handpicked favorites from our master pastry chefs.</p>
           </div>
-          <Link to="/home" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--color-pink)', fontSize: '1.1rem' }}>
+          <Link to="/birthday" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--color-pink)', fontSize: '1.1rem' }}>
             View Full Collection <ChevronRight size={22} />
           </Link>
         </div>
@@ -215,53 +243,96 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Floating Pastry Follower with Realistic Scroll Drip */}
-      <Link to="/exclusives" style={{ zIndex: 2500, display: 'block' }}>
+      {/* Floating Pastry Follower with Realistic Physics */}
+      <motion.div
+        style={{
+          position: 'fixed',
+          bottom: '150px',
+          right: '50px',
+          zIndex: 2500,
+          opacity: pastryOpacity,
+          pointerEvents: 'none',
+        }}
+      >
+        {/* Soft Moving Shadow */}
         <motion.div
-          whileHover={{ scale: 1.1 }}
+          animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.1, 0.2] }}
+          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
           style={{
-            position: 'fixed',
-            bottom: '150px',
-            right: '50px',
-            width: '270px',
-            height: '270px',
-            zIndex: 2500,
-            opacity: pastryOpacity,
+            position: 'absolute',
+            bottom: '-40px',
+            left: '15%',
+            width: '70%',
+            height: '20px',
+            background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%)',
+            filter: 'blur(5px)',
+            x: pathX,
+          }}
+        />
+
+        {/* Sprinkle Trail */}
+        {!isMobile && (
+          <>
+            <motion.div style={{ position: 'absolute', right: '-10px', top: '60px', x: sprinkleX1, y: sprinkleY1, width: '12px', height: '12px', background: '#F4EFE6', borderRadius: '50%', opacity: 0.9 }} />
+            <motion.div style={{ position: 'absolute', left: '-20px', top: '140px', x: sprinkleX2, y: sprinkleY2, width: '8px', height: '24px', background: '#D4AF37', borderRadius: '4px', rotate: 45, opacity: 0.9 }} />
+            <motion.div style={{ position: 'absolute', right: '40px', top: '-10px', x: sprinkleX3, y: sprinkleY3, width: '14px', height: '14px', background: '#F28CA3', borderRadius: '50%', opacity: 0.8 }} />
+          </>
+        )}
+        {/* Main Cake Physics Wrapper */}
+        <motion.div
+          style={{
+            x: pathX,
+            y: velocityYOffset,
+            scale: velocityScale,
+            rotate: tilt,
+            filter: blurFilter,
             pointerEvents: 'auto',
-            cursor: 'pointer'
           }}
         >
-          {/* Scroll-linked Realistic Cream Drips */}
-          <motion.div style={{ position: 'absolute', bottom: '60px', left: '25%', y: dripY1, zIndex: 1, marginLeft: '-10px' }}>
-            <svg viewBox="0 0 30 40" width="16" height="24" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }}>
-              <path d="M15 0 C15 0, 0 20, 0 30 C0 38.3, 6.7 40, 15 40 C23.3 40, 30 38.3, 30 30 C30 20, 15 0, 15 0 Z" fill="#F4EFE6" />
-            </svg>
-          </motion.div>
-          <motion.div style={{ position: 'absolute', bottom: '30px', left: '50%', y: dripY2, zIndex: 1, marginLeft: '-10px' }}>
-            <svg viewBox="0 0 30 40" width="22" height="32" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }}>
-              <path d="M15 0 C15 0, 0 20, 0 30 C0 38.3, 6.7 40, 15 40 C23.3 40, 30 38.3, 30 30 C30 20, 15 0, 15 0 Z" fill="#F4EFE6" />
-            </svg>
-          </motion.div>
-          <motion.div style={{ position: 'absolute', bottom: '45px', left: '75%', y: dripY3, zIndex: 1, marginLeft: '-10px' }}>
-            <svg viewBox="0 0 30 40" width="18" height="28" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }}>
-              <path d="M15 0 C15 0, 0 20, 0 30 C0 38.3, 6.7 40, 15 40 C23.3 40, 30 38.3, 30 30 C30 20, 15 0, 15 0 Z" fill="#F4EFE6" />
-            </svg>
-          </motion.div>
+          {/* Section Bounce Wrapper */}
+          <motion.div style={{ y: sectionBounceY }}>
+            {/* Gentle Floating Motion */}
+            <motion.div
+              animate={{ y: [-15, 15, -15] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+              whileHover={{ scale: 1.05 }}
+              style={{ width: '270px', height: '270px', cursor: 'pointer' }}
+            >
+              <Link to="/exclusives" style={{ display: 'block', width: '100%', height: '100%', position: 'relative' }}>
+                {/* Scroll-linked Realistic Cream Drips */}
+                <motion.div style={{ position: 'absolute', bottom: '60px', left: '25%', y: dripY1, zIndex: 1, marginLeft: '-10px' }}>
+                  <svg viewBox="0 0 30 40" width="16" height="24" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }}>
+                    <path d="M15 0 C15 0, 0 20, 0 30 C0 38.3, 6.7 40, 15 40 C23.3 40, 30 38.3, 30 30 C30 20, 15 0, 15 0 Z" fill="#F4EFE6" />
+                  </svg>
+                </motion.div>
+                <motion.div style={{ position: 'absolute', bottom: '30px', left: '50%', y: dripY2, zIndex: 1, marginLeft: '-10px' }}>
+                  <svg viewBox="0 0 30 40" width="22" height="32" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }}>
+                    <path d="M15 0 C15 0, 0 20, 0 30 C0 38.3, 6.7 40, 15 40 C23.3 40, 30 38.3, 30 30 C30 20, 15 0, 15 0 Z" fill="#F4EFE6" />
+                  </svg>
+                </motion.div>
+                <motion.div style={{ position: 'absolute', bottom: '45px', left: '75%', y: dripY3, zIndex: 1, marginLeft: '-10px' }}>
+                  <svg viewBox="0 0 30 40" width="18" height="28" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.15))' }}>
+                    <path d="M15 0 C15 0, 0 20, 0 30 C0 38.3, 6.7 40, 15 40 C23.3 40, 30 38.3, 30 30 C30 20, 15 0, 15 0 Z" fill="#F4EFE6" />
+                  </svg>
+                </motion.div>
 
-          <img 
-            src={floatingPastryImg} 
-            alt="Floating Pastry" 
-            style={{
-              position: 'relative',
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              mixBlendMode: 'screen',
-              zIndex: 2
-            }}
-          />
+                <img 
+                  src={floatingPastryImg} 
+                  alt="Floating Pastry" 
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    mixBlendMode: 'screen',
+                    zIndex: 2
+                  }}
+                />
+              </Link>
+            </motion.div>
+          </motion.div>
         </motion.div>
-      </Link>
+      </motion.div>
 
       {/* WhatsApp Floating Button */}
       <motion.a 

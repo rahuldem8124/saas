@@ -1,10 +1,9 @@
 import React from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
 import LandingPage from './pages/LandingPage';
-import CustomerHome from './pages/CustomerHome';
 import ProductPage from './pages/ProductPage';
 import CheckoutPage from './pages/CheckoutPage';
 import TrackingPage from './pages/TrackingPage';
@@ -52,7 +51,7 @@ function App() {
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/home" element={<CustomerHome />} />
+          <Route path="/home" element={<Navigate to="/" replace />} />
           <Route path="/birthday" element={<BirthdayPage />} />
           <Route path="/wedding" element={<WeddingPage />} />
           <Route path="/exclusives" element={<ExclusivesPage />} />

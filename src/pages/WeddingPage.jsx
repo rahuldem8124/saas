@@ -58,6 +58,7 @@ const WeddingPage = () => {
         }}></div>
 
         <motion.div
+          className="wedding-hero-card"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -67,7 +68,6 @@ const WeddingPage = () => {
             WebkitBackdropFilter: 'blur(25px)',
             border: '1px solid rgba(255, 255, 255, 0.3)',
             borderRadius: '40px',
-            padding: '4rem 6rem',
             boxShadow: '0 30px 60px rgba(0,0,0,0.15)',
             maxWidth: '900px',
             width: '90%'
@@ -79,7 +79,7 @@ const WeddingPage = () => {
           >
             The Wedding Collection
           </motion.div>
-          <h1 style={{ fontSize: '5.5rem', fontWeight: 900, marginBottom: '1.5rem', color: 'white', textShadow: '0 4px 20px rgba(0,0,0,0.2)', lineHeight: 1.1 }}>
+          <h1 className="wedding-hero-title" style={{ fontWeight: 900, marginBottom: '1.5rem', color: 'white', textShadow: '0 4px 20px rgba(0,0,0,0.2)', lineHeight: 1.1 }}>
             Celebrate Your <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontWeight: 400, color: '#FFE0E5' }}>Forever</span>
           </h1>
           <p style={{ fontSize: '1.5rem', fontWeight: 400, color: 'rgba(255,255,255,0.95)', maxWidth: '700px', margin: '0 auto', lineHeight: 1.6, textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>

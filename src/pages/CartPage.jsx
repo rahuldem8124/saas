@@ -37,7 +37,7 @@ const CartPage = () => {
         <p style={{ color: 'var(--color-brown)', fontSize: '1.2rem', opacity: 0.7, marginBottom: '3rem', maxWidth: '400px' }}>
           Looks like you haven't added any treats yet. Let's find something delicious!
         </p>
-        <Link to="/home" className="btn-primary" style={{ padding: '1.2rem 3rem', fontSize: '1.1rem', textDecoration: 'none' }}>
+        <Link to="/" className="btn-primary" style={{ padding: '1.2rem 3rem', fontSize: '1.1rem', textDecoration: 'none' }}>
           Browse Cakes
         </Link>
       </div>
@@ -47,7 +47,7 @@ const CartPage = () => {
   return (
     <div style={{ padding: '60px 5% 6rem', maxWidth: '1400px', margin: '0 auto' }}>
       <header style={{ marginBottom: '4rem', marginTop: '60px' }}>
-        <Link to="/home" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-brown)', textDecoration: 'none', fontWeight: 700, marginBottom: '2rem', opacity: 0.6 }}>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-brown)', textDecoration: 'none', fontWeight: 700, marginBottom: '2rem', opacity: 0.6 }}>
           <ChevronLeft size={20} /> Continue Shopping
         </Link>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -72,7 +72,7 @@ const CartPage = () => {
         </div>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '4rem', alignItems: 'start' }}>
+      <div className="cart-grid">
         {/* Left Side: Items */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <AnimatePresence>
@@ -105,6 +105,7 @@ const CartPage = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--color-cream)', padding: '0.5rem 1rem', borderRadius: '12px' }}>
                       <motion.button 
+                        className="touch-friendly"
                         whileTap={{ scale: 0.8 }}
                         onClick={() => updateQuantity(item.id, -1)}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
@@ -113,6 +114,7 @@ const CartPage = () => {
                       </motion.button>
                       <span style={{ fontWeight: 800, minWidth: '20px', textAlign: 'center' }}>{item.quantity}</span>
                       <motion.button 
+                        className="touch-friendly"
                         whileTap={{ scale: 0.8 }}
                         onClick={() => updateQuantity(item.id, 1)}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
@@ -131,7 +133,7 @@ const CartPage = () => {
         </div>
 
         {/* Right Side: Summary */}
-        <aside style={{ position: 'sticky', top: '120px' }}>
+        <aside className="mobile-sticky-summary" style={{ position: 'sticky', top: '120px' }}>
           <div className="card" style={{ padding: '3rem', background: 'white', border: '2px solid var(--color-cream)' }}>
             <h3 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '2.5rem' }}>Order Summary</h3>
             

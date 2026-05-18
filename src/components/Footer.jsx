@@ -29,7 +29,7 @@ const Footer = () => {
         <div>
           <h3 style={{ fontSize: '1.3rem', marginBottom: '1.8rem', fontWeight: 800, color: 'white' }}>Quick Links</h3>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <li><Link to="/home" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Home</Link></li>
+            <li><Link to="/" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Home</Link></li>
             <li><Link to="/birthday" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Birthday Cakes</Link></li>
             <li><Link to="/wedding" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Wedding Collection</Link></li>
             <li><Link to="/custom" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Custom Orders</Link></li>
