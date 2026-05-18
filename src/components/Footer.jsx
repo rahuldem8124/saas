@@ -18,7 +18,7 @@ const Footer = () => {
         margin: '0 auto'
       }}>
         <div>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', marginBottom: '1.5rem', fontWeight: 900 }}>
+          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', marginBottom: '1.5rem', fontWeight: 900, color: 'white' }}>
             CakeFlow<span style={{ color: 'var(--color-pink)' }}>.</span>
           </h2>
           <p style={{ opacity: 0.7, lineHeight: '1.8', marginBottom: '2rem', maxWidth: '350px' }}>
@@ -27,7 +27,7 @@ const Footer = () => {
         </div>
 
         <div>
-          <h3 style={{ fontSize: '1.3rem', marginBottom: '1.8rem', fontWeight: 800 }}>Quick Links</h3>
+          <h3 style={{ fontSize: '1.3rem', marginBottom: '1.8rem', fontWeight: 800, color: 'white' }}>Quick Links</h3>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <li><Link to="/home" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Home</Link></li>
             <li><Link to="/birthday" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Birthday Cakes</Link></li>
@@ -37,7 +37,7 @@ const Footer = () => {
         </div>
 
         <div>
-          <h3 style={{ fontSize: '1.3rem', marginBottom: '1.8rem', fontWeight: 800 }}>Support</h3>
+          <h3 style={{ fontSize: '1.3rem', marginBottom: '1.8rem', fontWeight: 800, color: 'white' }}>Support</h3>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <li><Link to="/about" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>About Us</Link></li>
             <li><Link to="/contact" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Contact</Link></li>
@@ -47,7 +47,7 @@ const Footer = () => {
         </div>
 
         <div>
-          <h3 style={{ fontSize: '1.3rem', marginBottom: '1.8rem', fontWeight: 800 }}>Contact Us</h3>
+          <h3 style={{ fontSize: '1.3rem', marginBottom: '1.8rem', fontWeight: 800, color: 'white' }}>Contact Us</h3>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
             <li style={{ opacity: 0.7, fontWeight: 600 }}>123 Bakery Lane, New York</li>
             <li style={{ opacity: 0.7, fontWeight: 600 }}>+1 (555) 123-4567</li>

@@ -22,30 +22,70 @@ const WeddingPage = () => {
 
   return (
     <div style={{ padding: '0 0 120px' }}>
-      {/* Wedding Hero Banner */}
+      {/* Wedding Hero Banner Redesign */}
       <section style={{ 
-        height: '60vh', 
-        background: 'linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url("https://images.unsplash.com/photo-1535254973040-607b474cb8c2?auto=format&fit=crop&w=1600&q=80")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        height: '70vh',
+        minHeight: '600px',
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         textAlign: 'center',
-        color: 'white',
-        marginBottom: '6rem'
+        marginBottom: '6rem',
+        overflow: 'hidden'
       }}>
-        <motion.h1 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          style={{ fontSize: '5rem', fontWeight: 900, marginBottom: '1.5rem', fontFamily: 'var(--font-heading)' }}
+        {/* Animated Background Image */}
+        <motion.div 
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundImage: 'url("https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1920&q=80")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: -2
+          }}
+        />
+        {/* Gradient Overlay for Readability */}
+        <div style={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'linear-gradient(135deg, rgba(74, 53, 44, 0.6) 0%, rgba(242, 140, 163, 0.4) 100%)',
+          zIndex: -1
+        }}></div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          style={{
+            background: 'rgba(255, 255, 255, 0.15)',
+            backdropFilter: 'blur(25px)',
+            WebkitBackdropFilter: 'blur(25px)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            borderRadius: '40px',
+            padding: '4rem 6rem',
+            boxShadow: '0 30px 60px rgba(0,0,0,0.15)',
+            maxWidth: '900px',
+            width: '90%'
+          }}
         >
-          Celebrate Your Forever
-        </motion.h1>
-        <p style={{ fontSize: '1.5rem', fontWeight: 500, maxWidth: '800px', opacity: 0.9 }}>
-          Handcrafted luxury tiers designed for your most magical moments.
-        </p>
+          <motion.div
+             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+             style={{ display: 'inline-block', padding: '0.5rem 1.5rem', background: 'rgba(255,255,255,0.2)', borderRadius: '20px', color: 'white', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase', fontSize: '0.9rem', marginBottom: '1.5rem' }}
+          >
+            The Wedding Collection
+          </motion.div>
+          <h1 style={{ fontSize: '5.5rem', fontWeight: 900, marginBottom: '1.5rem', color: 'white', textShadow: '0 4px 20px rgba(0,0,0,0.2)', lineHeight: 1.1 }}>
+            Celebrate Your <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontWeight: 400, color: '#FFE0E5' }}>Forever</span>
+          </h1>
+          <p style={{ fontSize: '1.5rem', fontWeight: 400, color: 'rgba(255,255,255,0.95)', maxWidth: '700px', margin: '0 auto', lineHeight: 1.6, textShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+            Handcrafted luxury tiers designed for your most magical moments. Let our master bakers bring your dream cake to life.
+          </p>
+        </motion.div>
       </section>
 
       <div style={{ padding: '0 5%', maxWidth: '1400px', margin: '0 auto' }}>

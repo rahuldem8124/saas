@@ -20,6 +20,7 @@ import AdminSettings from './pages/AdminSettings';
 import CartPage from './pages/CartPage';
 import BirthdayPage from './pages/BirthdayPage';
 import WeddingPage from './pages/WeddingPage';
+import ExclusivesPage from './pages/ExclusivesPage';
 import CustomPage from './pages/CustomPage';
 import ProfilePage from './pages/ProfilePage';
 import AboutPage from './pages/AboutPage';
@@ -54,6 +55,7 @@ function App() {
           <Route path="/home" element={<CustomerHome />} />
           <Route path="/birthday" element={<BirthdayPage />} />
           <Route path="/wedding" element={<WeddingPage />} />
+          <Route path="/exclusives" element={<ExclusivesPage />} />
           <Route path="/custom" element={<CustomPage />} />
           <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/cart" element={<CartPage />} />
