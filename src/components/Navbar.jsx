@@ -1,0 +1,244 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { Search, ShoppingBag, User as UserIcon, Menu, X, Shield } from 'lucide-react';
+
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const { cartCount } = useCart();
+  const { isAdmin } = useAuth();
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location]);
+
+  const navLinks = [
+    { name: 'Home', path: '/home' },
+    { name: 'Birthday', path: '/birthday' },
+    { name: 'Wedding', path: '/wedding' },
+    { name: 'Custom', path: '/custom' },
+  ];
+
+  return (
+    <>
+      <nav style={{
+        position: 'fixed',
+        top: 0,
+        width: '100%',
+        zIndex: 2000,
+        padding: scrolled ? '0.6rem 5%' : '1.2rem 5%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        boxSizing: 'border-box',
+        background: scrolled ? 'rgba(255, 248, 243, 0.85)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(20px)' : 'none',
+        WebkitBackdropFilter: scrolled ? 'blur(20px)' : 'none',
+        borderBottom: scrolled ? '1px solid rgba(122, 78, 58, 0.1)' : 'none',
+        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+      }}>
+        <div className="nav-left" style={{ display: 'flex', alignItems: 'center', gap: '3rem' }}>
+          <Link to="/home" style={{ 
+            fontFamily: 'var(--font-heading)', 
+            fontSize: '2.2rem', 
+            fontWeight: 900, 
+            color: 'var(--color-brown-dark)',
+            letterSpacing: '-1px',
+            textDecoration: 'none'
+          }}>
+            CakeFlow<span style={{ color: 'var(--color-pink)' }}>.</span>
+          </Link>
+          
+          <div className="desktop-only" style={{ display: 'flex', gap: '2.5rem' }}>
+            {navLinks.map(link => (
+              <Link key={link.name} to={link.path} className="nav-link" style={{ 
+                fontWeight: 800, 
+                color: location.pathname === link.path ? 'var(--color-pink)' : 'var(--color-brown-dark)',
+                fontSize: '1.05rem',
+                textDecoration: 'none',
+                opacity: location.pathname === link.path ? 1 : 0.7,
+                transition: 'all 0.3s ease'
+              }}>
+                {link.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+          {/* Animated Search Bar */}
+          <div className="desktop-only" style={{ 
+            position: 'relative', 
+            display: 'flex', 
+            alignItems: 'center',
+            background: 'rgba(122, 78, 58, 0.05)',
+            padding: '0.6rem 1.2rem',
+            borderRadius: 'var(--radius-xl)',
+            width: isSearchFocused ? '300px' : '180px',
+            transition: 'all 0.4s ease',
+            border: isSearchFocused ? '2px solid var(--color-pink)' : '2px solid transparent'
+          }}>
+            <Search size={18} color="var(--color-brown)" opacity={0.6} />
+            <input 
+              type="text" 
+              placeholder="Search cakes..." 
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                outline: 'none', 
+                paddingLeft: '0.8rem', 
+                width: '100%',
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                color: 'var(--color-brown-dark)'
+              }} 
+            />
+          </div>
+
+          <Link to="/cart" style={{ position: 'relative' }}>
+            <ShoppingBag size={26} color="var(--color-brown-dark)" />
+            {cartCount > 0 && (
+              <motion.span 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  background: 'var(--color-pink)',
+                  color: 'white',
+                  fontSize: '0.7rem',
+                  fontWeight: 900,
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'var(--shadow-glow)'
+                }}>
+                {cartCount}
+              </motion.span>
+            )}
+          </Link>
+          
+          <Link to="/profile" className="desktop-only">
+            <UserIcon size={26} color="var(--color-brown-dark)" />
+          </Link>
+
+          {isAdmin && (
+            <Link to="/admin" className="desktop-only" style={{ 
+              fontWeight: 900, 
+              color: 'white',
+              background: 'var(--gradient-pink)',
+              padding: '0.6rem 1.2rem',
+              borderRadius: 'var(--radius-xl)',
+              fontSize: '0.85rem',
+              boxShadow: 'var(--shadow-glow)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.6rem'
+            }}>
+              <Shield size={16} /> ADMIN
+            </Link>
+          )}
+
+          <button 
+            className="mobile-only" 
+            onClick={() => setIsOpen(true)}
+            style={{ padding: '0.5rem' }}
+          >
+            <Menu size={28} color="var(--color-brown-dark)" />
+          </button>
+        </div>
+      </nav>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              style={{ position: 'fixed', inset: 0, background: 'rgba(74, 44, 42, 0.4)', zIndex: 2999, backdropFilter: 'blur(5px)' }}
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                right: 0,
+                bottom: 0,
+                width: '80%',
+                background: 'var(--color-cream)',
+                zIndex: 3000,
+                padding: '2.5rem',
+                boxShadow: '-10px 0 50px rgba(0,0,0,0.1)'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
+                <span style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--color-brown-dark)' }}>Menu</span>
+                <button onClick={() => setIsOpen(false)}><X size={32} color="var(--color-brown-dark)" /></button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {[...navLinks, { name: 'My Profile', path: '/profile' }, { name: 'Order Tracking', path: '/tracking' }].map(link => (
+                  <Link 
+                    key={link.name} 
+                    to={link.path} 
+                    style={{ 
+                      fontSize: '1.6rem', 
+                      fontWeight: 800, 
+                      color: 'var(--color-brown-dark)', 
+                      textDecoration: 'none',
+                      padding: '1.2rem',
+                      background: 'white',
+                      borderRadius: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+                {isAdmin && (
+                  <Link to="/admin" style={{ padding: '1.2rem', background: 'var(--gradient-pink)', color: 'white', borderRadius: '20px', fontWeight: 900, fontSize: '1.6rem', textAlign: 'center', marginTop: '2rem' }}>
+                    ADMIN PANEL
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <style>{`
+        .mobile-only { display: none; }
+        @media (max-width: 1024px) {
+          .desktop-only { display: none !important; }
+          .mobile-only { display: block; }
+        }
+      `}</style>
+    </>
+  );
+};
+
+export default Navbar;

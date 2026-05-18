@@ -1,0 +1,305 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+  /* New Color Palette */
+  --color-cream: #FFF8F3;
+  --color-brown: #7A4E3A;
+  --color-brown-dark: #4A2C2A;
+  --color-pink: #F28CA3;
+  --color-peach: #FFD6A5;
+  --color-highlight: #E8B4B8;
+  --color-white: #FFFFFF;
+  --color-card: #FFFCFA;
+  --color-glass: rgba(255, 248, 243, 0.8);
+  
+  /* Gradients */
+  --gradient-pink: linear-gradient(135deg, #F28CA3 0%, #E8B4B8 100%);
+  --gradient-soft: linear-gradient(135deg, #FFF8F3 0%, #FFD6A5 100%);
+  
+  /* UI Tokens */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 40px;
+  --shadow-soft: 0 10px 30px rgba(74, 44, 42, 0.06);
+  --shadow-medium: 0 15px 40px rgba(74, 44, 42, 0.12);
+  --shadow-glow: 0 0 20px rgba(242, 140, 163, 0.4);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Typography */
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Outfit', sans-serif;
+
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-brown-dark);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-brown-dark);
+  margin-bottom: 1rem;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+  position: relative;
+}
+
+/* Hover Underline Animation */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gradient-pink);
+  transition: var(--transition);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: var(--font-body);
+  transition: var(--transition);
+}
+
+.glass {
+  background: var(--color-glass);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 2rem;
+  transition: var(--transition);
+  border: 1px solid rgba(122, 78, 58, 0.05);
+}
+
+.card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-primary {
+  background: var(--gradient-pink);
+  color: var(--color-white);
+  padding: 0.8rem 2.5rem;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-secondary {
+  background: var(--color-white);
+  color: var(--color-brown);
+  padding: 0.8rem 2.5rem;
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  border: 2px solid var(--color-pink);
+}
+
+.btn-secondary:hover {
+  background: var(--color-pink);
+  color: var(--color-white);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Category Chips */
+.chip {
+  padding: 0.6rem 1.8rem;
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+  color: var(--color-brown);
+  font-weight: 600;
+  border: 1px solid rgba(122, 78, 58, 0.1);
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.chip:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: var(--shadow-soft);
+}
+
+.chip.active {
+  background: var(--gradient-pink);
+  color: var(--color-white);
+  border: none;
+  box-shadow: var(--shadow-glow);
+}
+
+/* Image Zoom */
+.img-zoom-container {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.img-zoom {
+  transition: transform 0.5s ease;
+}
+
+.card:hover .img-zoom {
+  transform: scale(1.1);
+}
+
+/* Mobile Utilities */
+.mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-white);
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+  z-index: 1000;
+  border-radius: 20px 20px 0 0;
+}
+
+.floating-cart {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: var(--gradient-pink);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-glow);
+  z-index: 1001;
+}
+
+/* Responsive Utilities */
+@media (max-width: 1024px) {
+  :root {
+    --radius-lg: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: 2.5rem; }
+  h2 { font-size: 2rem; }
+}
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--color-brown-dark);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-medium);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  animation: slideUp 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+}
+
+@keyframes slideUp {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Responsive Grid Improvements */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3rem;
+}
+
+@media (max-width: 1200px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.wedding-gold {
+  color: #D4AF37;
+  font-family: var(--font-heading);
+}
+
+.empty-cart-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  text-align: center;
+}
+
+.cart-icon-animate {
+  animation: bounce 0.5s ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
