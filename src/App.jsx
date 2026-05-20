@@ -26,6 +26,12 @@ import AboutPage from './pages/AboutPage';
 import FavoritesPage from './pages/FavoritesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
+// Multi-Tenant SaaS Page Imports
+import SaaSPage from './pages/SaaSPage';
+import TenantStorefront from './pages/TenantStorefront';
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
+import CommunicationHub from './pages/CommunicationHub';
+
 // Simple placeholder components for missing pages
 const ContactPage = () => <div style={{ padding: '120px 5%' }}><h1>Contact Us</h1><p>Email: hello@cakeflow.com</p></div>;
 const FAQPage = () => <div style={{ padding: '120px 5%' }}><h1>FAQs</h1><p>Coming soon...</p></div>;
@@ -42,18 +48,24 @@ const ScrollToTop = () => {
 
 function App() {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  
+  // Hide Navbar and Footer for Admin Dashboards, Multi-Tenant Storefronts (except cakeflow flagship), and Super Admin dashboard
+  const isPlainCustomerRoute = 
+    !location.pathname.startsWith('/admin') && 
+    (!location.pathname.startsWith('/store') || location.pathname === '/store/cakeflow') && 
+    !location.pathname.startsWith('/super-admin');
 
   console.log("App.jsx: Rendering application...", location.pathname);
 
   return (
     <div className="app-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <ScrollToTop />
-      {!isAdminRoute && <Navbar />}
+      {isPlainCustomerRoute && <Navbar />}
       <main style={{ flex: 1 }}>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<SaaSPage />} />
           <Route path="/home" element={<Navigate to="/" replace />} />
+          <Route path="/store/cakeflow" element={<LandingPage />} />
           <Route path="/birthday" element={<BirthdayPage />} />
           <Route path="/wedding" element={<WeddingPage />} />
           <Route path="/exclusives" element={<ExclusivesPage />} />
@@ -66,6 +78,11 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           
+          {/* SaaS Portal routes */}
+          <Route path="/saas" element={<SaaSPage />} />
+          <Route path="/store/:businessId" element={<TenantStorefront />} />
+          <Route path="/super-admin" element={<SuperAdminDashboard />} />
+
           {/* Admin Routes protected with ProtectedRoute wrapper */}
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/orders" element={<ProtectedRoute><OrderManagement /></ProtectedRoute>} />
@@ -76,6 +93,7 @@ function App() {
           <Route path="/admin/delivery" element={<ProtectedRoute><AdminDelivery /></ProtectedRoute>} />
           <Route path="/admin/coupons" element={<ProtectedRoute><AdminCoupons /></ProtectedRoute>} />
           <Route path="/admin/settings" element={<ProtectedRoute><AdminSettings /></ProtectedRoute>} />
+          <Route path="/admin/communication" element={<ProtectedRoute><CommunicationHub /></ProtectedRoute>} />
           
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
@@ -83,7 +101,7 @@ function App() {
           <Route path="/terms" element={<TermsPage />} />
         </Routes>
       </main>
-      {!isAdminRoute && <Footer />}
+      {isPlainCustomerRoute && <Footer />}
     </div>
   );
 }

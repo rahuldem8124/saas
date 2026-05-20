@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import CakeCard from '../components/CakeCard';
 import cake3D from '../assets/cake_white_bg.png';
 import floatingPastryImg from '../assets/floating_pastry.png';
+import SaaSSandboxBanner from '../components/SaaSSandboxBanner';
 
 const LandingPage = () => {
   const popularCakes = [
@@ -87,7 +88,8 @@ const LandingPage = () => {
   const dripY3 = useTransform(scrollY, [0, 600], [0, 150]);
 
   return (
-    <div className="landing-page" style={{ paddingTop: '80px' }}>
+    <div className="landing-page" style={{ paddingTop: '130px' }}>
+      <SaaSSandboxBanner businessId="cakeflow" />
       
       {/* Dynamic Offer & Emergency Delivery Banners */}
       <div style={{ display: 'flex', flexDirection: 'column' }}>

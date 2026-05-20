@@ -6,6 +6,7 @@ import App from './App.jsx'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
 import { FavoritesProvider } from './context/FavoritesContext'
+import { TenantProvider } from './context/TenantContext'
 
 const rootElement = document.getElementById('root');
 if (rootElement) {
@@ -13,11 +14,13 @@ if (rootElement) {
     <StrictMode>
       <Router>
         <AuthProvider>
-          <CartProvider>
-            <FavoritesProvider>
-              <App />
-            </FavoritesProvider>
-          </CartProvider>
+          <TenantProvider>
+            <CartProvider>
+              <FavoritesProvider>
+                <App />
+              </FavoritesProvider>
+            </CartProvider>
+          </TenantProvider>
         </AuthProvider>
       </Router>
     </StrictMode>

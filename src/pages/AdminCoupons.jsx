@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { Ticket, LayoutDashboard, ShoppingBag, Package, Users, DollarSign, BarChart2, Truck, Settings as SettingsIcon, Eye, Plus, Search, Trash2, Edit2 } from 'lucide-react';
+import { Ticket, LayoutDashboard, ShoppingBag, Package, Users, DollarSign, BarChart2, Truck, Settings as SettingsIcon, Eye, Plus, Search, Trash2, Edit2, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTenant } from '../context/TenantContext';
 
 const AdminCoupons = () => {
-  const { switchRole } = useAuth();
+  const { user, switchRole } = useAuth();
+  const { businesses } = useTenant();
+  const activeBizId = user?.businessId || 'cakeflow';
+  const biz = businesses[activeBizId] || businesses['cakeflow'];
   
   const navItems = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin' },
@@ -16,11 +20,12 @@ const AdminCoupons = () => {
     { name: 'Delivery', icon: <Truck size={20} />, path: '/admin/delivery' },
     { name: 'Coupons', icon: <Ticket size={20} />, path: '/admin/coupons', active: true },
     { name: 'Settings', icon: <SettingsIcon size={20} />, path: '/admin/settings' },
+    { name: 'Communication', icon: <MessageSquare size={20} />, path: '/admin/communication' }
   ];
 
   const [coupons, setCoupons] = useState([
     { code: "SWEET10", discount: "10% OFF", type: "Percentage", usage: "145/500", status: "Active", expiry: "Dec 31, 2024" },
-    { code: "CAKEFLOW50", discount: "$5.00 OFF", type: "Fixed Amount", usage: "89/200", status: "Active", expiry: "Nov 15, 2024" },
+    { code: "SHOPFLOW50", discount: "$5.00 OFF", type: "Fixed Amount", usage: "89/200", status: "Active", expiry: "Nov 15, 2024" },
     { code: "WEDDING2024", discount: "15% OFF", type: "Wedding Only", usage: "12/50", status: "Active", expiry: "Dec 01, 2024" },
     { code: "WELCOME", discount: "20% OFF", type: "New User", usage: "342/Unlimited", status: "Active", expiry: "Never" },
     { code: "EXPIRED10", discount: "10% OFF", type: "General", usage: "100/100", status: "Expired", expiry: "Oct 01, 2024" },
@@ -59,8 +64,11 @@ const AdminCoupons = () => {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream)' }}>
       <aside style={{ width: '280px', backgroundColor: 'var(--color-white)', borderRight: '1px solid rgba(122, 78, 58, 0.1)', padding: '2.5rem 1.5rem', position: 'fixed', height: '100vh', boxSizing: 'border-box', zIndex: 1100, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 'bold', marginBottom: '2.5rem', color: 'var(--color-brown-dark)' }}>
-          CakeFlow <span style={{ fontSize: '0.9rem', color: 'var(--color-pink)', fontWeight: 800 }}>ADMIN</span>
+        <div style={{ fontSize: '1.6rem', fontFamily: 'var(--font-heading)', fontWeight: 'bold', marginBottom: '2.5rem', color: 'var(--color-brown-dark)' }}>
+          <div>{biz.name}</div>
+          <span style={{ fontSize: '0.85rem', color: 'var(--color-pink)', fontWeight: 900, textTransform: 'uppercase' }}>
+            {biz.category} OPERATOR
+          </span>
         </div>
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1, overflowY: 'auto' }}>
           {navItems.map(item => (

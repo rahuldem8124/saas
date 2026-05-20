@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { Truck, LayoutDashboard, ShoppingBag, Package, Users, DollarSign, BarChart2, Ticket, Settings as SettingsIcon, Eye, MapPin, Clock, Plus } from 'lucide-react';
+import { Truck, LayoutDashboard, ShoppingBag, Package, Users, DollarSign, BarChart2, Ticket, Settings as SettingsIcon, Eye, MapPin, Clock, Plus, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTenant } from '../context/TenantContext';
 
 const AdminDelivery = () => {
-  const { switchRole } = useAuth();
+  const { user, switchRole } = useAuth();
+  const { businesses } = useTenant();
+  const activeBizId = user?.businessId || 'cakeflow';
+  const biz = businesses[activeBizId] || businesses['cakeflow'];
   
   const navItems = [
     { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin' },
@@ -16,6 +20,7 @@ const AdminDelivery = () => {
     { name: 'Delivery', icon: <Truck size={20} />, path: '/admin/delivery', active: true },
     { name: 'Coupons', icon: <Ticket size={20} />, path: '/admin/coupons' },
     { name: 'Settings', icon: <SettingsIcon size={20} />, path: '/admin/settings' },
+    { name: 'Communication', icon: <MessageSquare size={20} />, path: '/admin/communication' }
   ];
 
   const [deliveryZones, setDeliveryZones] = useState([
@@ -56,8 +61,11 @@ const AdminDelivery = () => {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream)' }}>
       <aside style={{ width: '280px', backgroundColor: 'var(--color-white)', borderRight: '1px solid rgba(122, 78, 58, 0.1)', padding: '2.5rem 1.5rem', position: 'fixed', height: '100vh', boxSizing: 'border-box', zIndex: 1100, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 'bold', marginBottom: '2.5rem', color: 'var(--color-brown-dark)' }}>
-          CakeFlow <span style={{ fontSize: '0.9rem', color: 'var(--color-pink)', fontWeight: 800 }}>ADMIN</span>
+        <div style={{ fontSize: '1.6rem', fontFamily: 'var(--font-heading)', fontWeight: 'bold', marginBottom: '2.5rem', color: 'var(--color-brown-dark)' }}>
+          <div>{biz.name}</div>
+          <span style={{ fontSize: '0.85rem', color: 'var(--color-pink)', fontWeight: 900, textTransform: 'uppercase' }}>
+            {biz.category} OPERATOR
+          </span>
         </div>
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1, overflowY: 'auto' }}>
           {navItems.map(item => (

@@ -1,10 +1,15 @@
 import React from 'react';
-import { Users, LayoutDashboard, ShoppingBag, Package, DollarSign, BarChart2, Truck, Ticket, Settings as SettingsIcon, Search, Filter, Mail, Phone, MoreVertical, Eye } from 'lucide-react';
+import { Users, LayoutDashboard, ShoppingBag, Package, DollarSign, BarChart2, Truck, Ticket, Settings as SettingsIcon, Search, Filter, Mail, Phone, MoreVertical, Eye, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTenant } from '../context/TenantContext';
 
 const AdminCustomers = () => {
-  const { switchRole } = useAuth();
+  const { user, switchRole } = useAuth();
+  const { businesses } = useTenant();
+  const activeBizId = user?.businessId || 'cakeflow';
+  const biz = businesses[activeBizId] || businesses['cakeflow'];
+
   const customers = [
     { id: 1, name: "Alice Green", email: "alice@example.com", phone: "+1 234 567 890", orders: 12, totalSpent: "$540", lastOrder: "2 days ago" },
     { id: 2, name: "Bob Smith", email: "bob@example.com", phone: "+1 234 567 891", orders: 5, totalSpent: "$210", lastOrder: "5 days ago" },
@@ -23,13 +28,17 @@ const AdminCustomers = () => {
     { name: 'Delivery', icon: <Truck size={20} />, path: '/admin/delivery' },
     { name: 'Coupons', icon: <Ticket size={20} />, path: '/admin/coupons' },
     { name: 'Settings', icon: <SettingsIcon size={20} />, path: '/admin/settings' },
+    { name: 'Communication', icon: <MessageSquare size={20} />, path: '/admin/communication' }
   ];
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--color-cream)' }}>
       <aside style={{ width: '280px', backgroundColor: 'var(--color-white)', borderRight: '1px solid rgba(122, 78, 58, 0.1)', padding: '2.5rem 1.5rem', position: 'fixed', height: '100vh', boxSizing: 'border-box', zIndex: 1100, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ fontSize: '2rem', fontFamily: 'var(--font-heading)', fontWeight: 'bold', marginBottom: '2.5rem', color: 'var(--color-brown-dark)' }}>
-          CakeFlow <span style={{ fontSize: '0.9rem', color: 'var(--color-pink)', fontWeight: 800 }}>ADMIN</span>
+        <div style={{ fontSize: '1.6rem', fontFamily: 'var(--font-heading)', fontWeight: 'bold', marginBottom: '2.5rem', color: 'var(--color-brown-dark)' }}>
+          <div>{biz.name}</div>
+          <span style={{ fontSize: '0.85rem', color: 'var(--color-pink)', fontWeight: 900, textTransform: 'uppercase' }}>
+            {biz.category} OPERATOR
+          </span>
         </div>
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1, overflowY: 'auto' }}>
           {navItems.map(item => (
@@ -59,7 +68,7 @@ const AdminCustomers = () => {
       <main style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
         <header style={{ marginBottom: '4rem' }}>
           <h1 style={{ fontSize: '3rem', fontWeight: 800 }}>Customer Directory</h1>
-          <p style={{ color: 'var(--color-brown)', fontSize: '1.1rem', opacity: 0.8 }}>Manage your cake lovers and their preferences.</p>
+          <p style={{ color: 'var(--color-brown)', fontSize: '1.1rem', opacity: 0.8 }}>Manage your customers and their preferences.</p>
         </header>
 
         <div className="card" style={{ padding: '0', background: 'white', overflow: 'hidden' }}>
