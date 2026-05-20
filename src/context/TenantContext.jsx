@@ -158,6 +158,38 @@ const initialBusinesses = {
     templates: [
       { id: "t1", name: "Custom Confirmation", body: "Got it! Your custom build {product} is verified. Accent: {colorPicker}." }
     ]
+  },
+  "threads-co": {
+    id: "threads-co",
+    name: "Threads & Co. Apparel",
+    category: "Clothing",
+    theme: "Minimal",
+    subscription: "Pro",
+    isSubscribed: false,
+    whatsappNumber: "+15555566",
+    instagramUsername: "threads_co",
+    deliveryProvider: "Delhivery",
+    fields: [
+      { id: "size", name: "Select Size", type: "Dropdown", options: ["XS", "S", "M", "L", "XL"], required: true },
+      { id: "color", name: "Select Color", type: "Dropdown", options: ["Creamy Off-White", "Charcoal Black", "Soft Sage", "Vintage Indigo"], required: true },
+      { id: "fit", name: "Fit Style", type: "Dropdown", options: ["Oversized", "Slim Fit", "Relaxed Fit"], required: true },
+      { id: "monogram", name: "Custom Monogram (Initial)", type: "Text", required: false, placeholder: "e.g. R.D. (Max 5 letters)" }
+    ],
+    products: [
+      { id: 601, name: "Vintage Denim Jacket", price: "$135.00", rating: 4.9, image: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=400&q=80", category: "Jackets", desc: "Heavyweight selvedge denim jacket with a relaxed drop shoulder." },
+      { id: 602, name: "Classic Organic Tee", price: "$35.00", rating: 4.8, image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=400&q=80", category: "Essentials", desc: "Mid-weight organic cotton tee with a perfect premium drape." },
+      { id: 603, name: "Premium Wash Hoodie", price: "$85.00", rating: 5.0, image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=400&q=80", category: "Essentials", desc: "Ultra-soft French terry hoodie in a vintage washed finish." }
+    ],
+    orders: [
+      { id: "CL-6001", customer: "Robert Downey", date: "May 19, 2026", amount: "$135.00", status: "Packed", payment: "Paid", email: "robert@example.com", customFields: { size: "M", color: "Vintage Indigo", fit: "Relaxed Fit", monogram: "RD" }, items: [{ name: "Vintage Denim Jacket", price: "$135.00", quantity: 1 }] }
+    ],
+    chats: [
+      { id: 1, sender: "customer", text: "Is the hoodie oversized by design?", timestamp: "11:45 AM" },
+      { id: 2, sender: "bot", text: "Yes! Our Premium Wash Hoodie has a drop shoulder, slightly cropped body, and oversized fit. We recommend ordering true-to-size.", timestamp: "11:46 AM" }
+    ],
+    templates: [
+      { id: "t1", name: "Order Placed", body: "Hi {customer}, your order for {product} is confirmed! Fit: {fit}. Status: {status}." }
+    ]
   }
 };
 
@@ -236,6 +268,19 @@ export const TenantProvider = ({ children }) => {
       ];
       defaultOrders = [
         { id: `SH-${Date.now().toString().slice(-4)}`, customer: "Sample Client", date: "Today", amount: "$110.00", status: "Packed", payment: "Paid", email: "client@example.com", customFields: { size: "9", color: "White" }, items: [{ name: "Vapor Runner Elite", price: "$110.00", quantity: 1 }] }
+      ];
+    } else if (businessData.category === "Clothing") {
+      defaultFields = [
+        { id: "size", name: "Select Size", type: "Dropdown", options: ["XS", "S", "M", "L", "XL"], required: true },
+        { id: "color", name: "Select Color", type: "Dropdown", options: ["Creamy Off-White", "Charcoal Black", "Soft Sage", "Vintage Indigo"], required: true },
+        { id: "fit", name: "Fit Style", type: "Dropdown", options: ["Oversized", "Slim Fit", "Relaxed Fit"], required: true },
+        { id: "monogram", name: "Custom Monogram", type: "Text", required: false, placeholder: "e.g. R.D." }
+      ];
+      defaultProducts = [
+        { id: Date.now() + 1, name: "Classic Organic Tee", price: "$35.00", rating: 4.8, image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=400&q=80", category: "Essentials", desc: "Mid-weight organic cotton tee with a perfect premium drape." }
+      ];
+      defaultOrders = [
+        { id: `CL-${Date.now().toString().slice(-4)}`, customer: "Sample Client", date: "Today", amount: "$35.00", status: "Packed", payment: "Paid", email: "client@example.com", customFields: { size: "M", color: "Creamy Off-White", fit: "Relaxed Fit" }, items: [{ name: "Classic Organic Tee", price: "$35.00", quantity: 1 }] }
       ];
     } else if (businessData.category === "Accessories") {
       defaultFields = [
@@ -359,7 +404,14 @@ export const TenantProvider = ({ children }) => {
   };
 
   const addOrder = (businessId, order) => {
-    const orderId = `${businessId === 'cakeflow' ? 'CF' : businessId === 'fastfoot' ? 'SH' : businessId === 'rose-gold' ? 'AC' : businessId === 'crafty' ? 'HM' : 'CS'}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const biz = businesses[businessId];
+    const prefix = businessId === 'cakeflow' ? 'CF' : 
+                   businessId === 'fastfoot' ? 'SH' : 
+                   businessId === 'rose-gold' ? 'AC' : 
+                   businessId === 'crafty' ? 'HM' : 
+                   businessId === 'threads-co' ? 'CL' : 
+                   (biz?.category === 'Clothing' ? 'CL' : 'CS');
+    const orderId = `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`;
     const newOrder = {
       id: orderId,
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),

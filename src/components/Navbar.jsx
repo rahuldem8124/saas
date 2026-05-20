@@ -25,8 +25,14 @@ const Navbar = () => {
     setIsOpen(false);
   }, [location]);
 
-  const isRetailStore = true;
-  const isSaaSActive = false;
+  const isStorefront = location.pathname.startsWith('/store');
+  const isSaaSActive = 
+    location.pathname.startsWith('/saas') || 
+    location.pathname.startsWith('/super-admin') || 
+    location.pathname.startsWith('/admin') || 
+    (isStorefront && !location.pathname.startsWith('/store/cakeflow'));
+  
+  const isRetailStore = !isSaaSActive;
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Birthday', path: '/birthday' },
@@ -34,9 +40,8 @@ const Navbar = () => {
     { name: 'Exclusives', path: '/exclusives' },
     { name: 'Custom', path: '/custom' }
   ];
-  const isStorefront = false;
-  const renderShopFlowNav = false;
-  const renderCakeFlowNav = true;
+  const renderShopFlowNav = true;
+  const renderCakeFlowNav = !isSaaSActive;
 
   return (
     <>
@@ -59,7 +64,7 @@ const Navbar = () => {
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
           <div className="nav-left" style={{ display: 'flex', alignItems: 'center', gap: '3rem' }}>
-            <Link to="/" style={{ 
+            <Link to="/saas" style={{ 
               fontFamily: 'var(--font-heading)', 
               fontSize: '2.2rem', 
               fontWeight: 950, 
@@ -72,9 +77,10 @@ const Navbar = () => {
             
             <div className="hide-on-mobile" style={{ display: 'flex', gap: '2.5rem' }}>
               {[
-                { name: 'SaaS Platform', path: '/' },
+                { name: 'SaaS Platform', path: '/saas' },
                 { name: 'Bakery Demo', path: '/store/cakeflow' },
-                { name: 'Sneakers Demo', path: '/store/fastfoot' }
+                { name: 'Sneakers Demo', path: '/store/fastfoot' },
+                { name: 'Apparel Demo', path: '/store/threads-co' }
               ].map(link => (
                 <Link key={link.name} to={link.path} className="nav-link" style={{ 
                   fontWeight: 800, 
@@ -145,7 +151,7 @@ const Navbar = () => {
       {renderCakeFlowNav && (
         <nav style={{
           position: 'fixed',
-          top: renderShopFlowNav ? (scrolled ? '104px' : '124px') : 0,
+          top: renderShopFlowNav ? (scrolled ? '71px' : '89px') : 0,
           width: '100%',
           zIndex: 1999,
           padding: scrolled ? '0.6rem 5%' : '1.2rem 5%',

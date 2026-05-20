@@ -513,7 +513,7 @@ const TenantStorefront = () => {
 
                   {[
                     { label: "Placed", active: true },
-                    { label: biz.category === 'Cake' ? "Baking" : biz.category === 'Shoes' ? "Packing" : "Preparing", active: true },
+                    { label: biz.category === 'Cake' ? "Baking" : biz.category === 'Shoes' ? "Packing" : biz.category === 'Clothing' ? "Tailoring" : "Preparing", active: true },
                     { label: "Shipped", active: false },
                     { label: "Delivered", active: false }
                   ].map((prog, i) => (

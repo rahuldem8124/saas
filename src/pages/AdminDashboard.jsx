@@ -302,6 +302,77 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        {/* -------------------- CLOTHING BUSINESS DASHBOARD -------------------- */}
+        {biz.category === 'Clothing' && (
+          <div>
+            <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '2.5rem', marginBottom: '4rem' }}>
+              {[
+                { label: "Active Apparel Collection", value: `${biz.products.length} Items`, icon: <Package />, trend: "Essentials & Outerwear active" },
+                { label: "Top Selected Silhouette", value: "Oversized Fit", icon: <Layers />, trend: "82% of buyers prefer relaxed cuts" },
+                { label: "Monogram Requests", value: orders.filter(o => o.customFields?.monogram).length.toString(), icon: <Award />, trend: "Custom embroidery queue" },
+                { label: "Apparel Revenue", value: `$${totalRevenue.toFixed(2)}`, icon: <DollarSign />, trend: "Merchant payout cleared" }
+              ].map((stat, i) => (
+                <div key={i} className="card" style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', background: 'white' }}>
+                  <div>
+                    <div style={{ color: 'var(--color-brown)', fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.8rem' }}>{stat.label}</div>
+                    <div style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--color-brown-dark)' }}>{stat.value}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--color-pink)', marginTop: '0.8rem', fontWeight: 800 }}>{stat.trend}</div>
+                  </div>
+                  <div style={{ width: '56px', height: '56px', borderRadius: '16px', backgroundColor: 'rgba(79, 70, 229, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4F46E5' }}>
+                    {stat.icon}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Custom Apparel Size & Monogram Dashboard */}
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2.5rem', marginBottom: '4rem' }}>
+              <div className="card" style={{ padding: '2.5rem', background: 'white' }}>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '2rem' }}>Apparel Size Demands</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'flex-end', height: '160px' }}>
+                  {[
+                    { size: "XS", pct: 15 },
+                    { size: "S", pct: 35 },
+                    { size: "M", pct: 85 },
+                    { size: "L", pct: 55 },
+                    { size: "XL", pct: 25 }
+                  ].map((s, i) => (
+                    <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ width: '100%', height: `${s.pct}%`, background: 'linear-gradient(to top, #4F46E5, #818CF8)', borderRadius: '6px 6px 0 0' }} />
+                      <span style={{ fontSize: '0.8rem', fontWeight: 800 }}>{s.size} ({s.pct}%)</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="card" style={{ padding: '2.5rem', background: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: 900, marginBottom: '0.5rem' }}>Active Monograms</h3>
+                  <p style={{ fontSize: '0.85rem', color: '#64748B', fontWeight: 500, marginBottom: '1.5rem' }}>Embroidery queue details:</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {orders.filter(o => o.customFields?.monogram).length > 0 ? (
+                      orders.filter(o => o.customFields?.monogram).map((o, idx) => (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.8rem 1rem', background: '#F8FAFC', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+                          <span style={{ fontWeight: 800, color: '#334155', fontSize: '0.9rem' }}>{o.customer}</span>
+                          <span style={{ background: '#EEF2FF', color: '#4F46E5', fontWeight: 900, padding: '0.25rem 0.75rem', borderRadius: '8px', fontSize: '0.85rem', letterSpacing: '1px' }}>
+                            "{o.customFields.monogram}"
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ color: '#64748B', textAlign: 'center', padding: '2rem', fontSize: '0.9rem' }}>No custom monograms in queue.</div>
+                    )}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1.5rem', color: '#10B981', fontWeight: 800, fontSize: '0.85rem' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981' }} />
+                  Embroidery Station Calibrated
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* -------------------- ACCESSORIES BUSINESS DASHBOARD -------------------- */}
         {biz.category === 'Accessories' && (
           <div>

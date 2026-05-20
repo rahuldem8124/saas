@@ -41,6 +41,7 @@ const SaaSPage = () => {
   const categories = [
     { name: 'Cake', desc: 'Bakers & Custom Confectioners', color: '#FFF3F5' },
     { name: 'Shoes', desc: 'Custom Sneakers & Footwear', color: '#F3F4F6' },
+    { name: 'Clothing', desc: 'Bespoke Apparel & Streetwear', color: '#EEF2FF' },
     { name: 'Accessories', desc: 'Boutique Jewelry & Accessories', color: '#FAF5FF' },
     { name: 'Handmade', desc: 'Artisanal Clay & Crafted Goods', color: '#FFFBEB' },
     { name: 'Custom', desc: 'Flexible templates for custom niches', color: '#ECFDF5' }
@@ -191,6 +192,7 @@ const SaaSPage = () => {
               {[
                 { id: 'cakeflow', name: 'CakeFlow Bakery', category: 'Cake', icon: '🎂', desc: 'Elegant layered wedding tiers, custom weight selection & flavor options.', path: '/store/cakeflow', color: '#FFF3F5' },
                 { id: 'fastfoot', name: 'FastFoot Sneaker Lab', category: 'Shoes', icon: '👟', desc: 'High-contrast sport aesthetic, modular shoe size selectors & custom colors.', path: '/store/fastfoot', color: '#F3F4F6' },
+                { id: 'threads-co', name: 'Threads & Co. Apparel', category: 'Clothing', icon: '👕', desc: 'High-end apparel with bespoke monograms, fit options & premium textiles.', path: '/store/threads-co', color: '#EEF2FF' },
                 { id: 'rose-gold', name: 'RoseGold Atelier', category: 'Accessories', icon: '💍', desc: 'Luxury brand styling with custom metal polish options & engraving.', path: '/store/rose-gold', color: '#FAF5FF' },
                 { id: 'crafty', name: 'Clay & Co. Pottery', category: 'Handmade', icon: '🎨', desc: 'Artisanal pottery models, paint options, and custom gift wrapping.', path: '/store/crafty', color: '#FFFBEB' },
                 { id: 'builder-box', name: 'Flex Custom Atelier', category: 'Custom', icon: '📦', desc: 'Modular visual arrangements, custom text attachments & mystery boxes.', path: '/store/builder-box', color: '#ECFDF5' }

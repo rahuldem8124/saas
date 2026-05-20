@@ -54,13 +54,22 @@ function App() {
     !location.pathname.startsWith('/admin') && 
     !location.pathname.startsWith('/super-admin');
 
+  const isStorefront = location.pathname.startsWith('/store');
+  const isSaaSActive = 
+    location.pathname.startsWith('/saas') || 
+    location.pathname.startsWith('/super-admin') || 
+    location.pathname.startsWith('/admin') || 
+    (isStorefront && !location.pathname.startsWith('/store/cakeflow'));
+  
+  const hasBothNavbars = isPlainCustomerRoute && !isSaaSActive;
+
   console.log("App.jsx: Rendering application...", location.pathname);
 
   return (
     <div className="app-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <ScrollToTop />
       {isPlainCustomerRoute && <Navbar />}
-      <main style={{ flex: 1 }}>
+      <main style={{ flex: 1, paddingTop: hasBothNavbars ? '89px' : '0px' }}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/home" element={<Navigate to="/" replace />} />
@@ -77,10 +86,10 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           
-          {/* SaaS Portal routes redirected to root */}
-          <Route path="/saas" element={<Navigate to="/" replace />} />
-          <Route path="/store/:businessId" element={<Navigate to="/" replace />} />
-          <Route path="/super-admin" element={<Navigate to="/" replace />} />
+          {/* SaaS Portal routes */}
+          <Route path="/saas" element={<SaaSPage />} />
+          <Route path="/store/:businessId" element={<TenantStorefront />} />
+          <Route path="/super-admin" element={<SuperAdminDashboard />} />
 
           {/* Admin Routes protected with ProtectedRoute wrapper */}
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
