@@ -5,6 +5,7 @@ const Footer = () => {
   const location = useLocation();
   const isStorefront = location.pathname.startsWith('/store');
   const isSaaSActive = 
+    location.pathname === '/' ||
     location.pathname.startsWith('/saas') || 
     location.pathname.startsWith('/super-admin') || 
     location.pathname.startsWith('/admin') || 

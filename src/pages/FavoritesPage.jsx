@@ -11,7 +11,7 @@ const FavoritesPage = () => {
   return (
     <div style={{ padding: '40px 5% 120px', maxWidth: '1400px', margin: '0 auto' }}>
       <header style={{ marginBottom: '5rem', marginTop: '60px' }}>
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-brown)', textDecoration: 'none', fontWeight: 700, marginBottom: '2rem', opacity: 0.6 }}>
+        <Link to="/store/cakeflow" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-brown)', textDecoration: 'none', fontWeight: 700, marginBottom: '2rem', opacity: 0.6 }}>
           <ChevronLeft size={20} /> Back to Home
         </Link>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>

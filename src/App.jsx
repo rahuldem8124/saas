@@ -56,6 +56,7 @@ function App() {
 
   const isStorefront = location.pathname.startsWith('/store');
   const isSaaSActive = 
+    location.pathname === '/' ||
     location.pathname.startsWith('/saas') || 
     location.pathname.startsWith('/super-admin') || 
     location.pathname.startsWith('/admin') || 
@@ -71,9 +72,9 @@ function App() {
       {isPlainCustomerRoute && <Navbar />}
       <main style={{ flex: 1, paddingTop: hasBothNavbars ? '89px' : '0px' }}>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<SaaSPage />} />
           <Route path="/home" element={<Navigate to="/" replace />} />
-          <Route path="/store/cakeflow" element={<Navigate to="/" replace />} />
+          <Route path="/store/cakeflow" element={<LandingPage />} />
           <Route path="/birthday" element={<BirthdayPage />} />
           <Route path="/wedding" element={<WeddingPage />} />
           <Route path="/exclusives" element={<ExclusivesPage />} />
@@ -87,7 +88,7 @@ function App() {
           <Route path="/favorites" element={<FavoritesPage />} />
           
           {/* SaaS Portal routes */}
-          <Route path="/saas" element={<SaaSPage />} />
+          <Route path="/saas" element={<Navigate to="/" replace />} />
           <Route path="/store/:businessId" element={<TenantStorefront />} />
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
 

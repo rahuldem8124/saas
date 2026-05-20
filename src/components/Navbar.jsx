@@ -27,6 +27,7 @@ const Navbar = () => {
 
   const isStorefront = location.pathname.startsWith('/store');
   const isSaaSActive = 
+    location.pathname === '/' ||
     location.pathname.startsWith('/saas') || 
     location.pathname.startsWith('/super-admin') || 
     location.pathname.startsWith('/admin') || 
@@ -180,7 +181,7 @@ const Navbar = () => {
             
             <div className="hide-on-mobile" style={{ display: 'flex', gap: '2.5rem' }}>
               {[
-                { name: 'Home', path: '/' },
+                { name: 'Home', path: '/store/cakeflow' },
                 { name: 'Birthday', path: '/birthday' },
                 { name: 'Wedding', path: '/wedding' },
                 { name: 'Exclusives', path: '/exclusives' },
@@ -354,7 +355,7 @@ const Navbar = () => {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {[
-                  { name: 'Home', path: '/' },
+                  { name: 'Home', path: '/store/cakeflow' },
                   { name: 'Birthday', path: '/birthday' },
                   { name: 'Wedding', path: '/wedding' },
                   { name: 'Exclusives', path: '/exclusives' },
@@ -400,7 +401,7 @@ const Navbar = () => {
 
       {/* Mobile Bottom Navigation */}
       <div className="mobile-bottom-nav">
-        <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
+        <Link to="/store/cakeflow" className={location.pathname === '/store/cakeflow' ? 'active' : ''}>
           <Home size={22} />
           <span>Home</span>
         </Link>

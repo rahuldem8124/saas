@@ -85,7 +85,7 @@ const TrackingPage = () => {
   return (
     <div style={{ padding: '60px 5% 6rem', maxWidth: '1100px', margin: '0 auto' }}>
       <header style={{ textAlign: 'center', marginBottom: '5rem', marginTop: '60px' }}>
-        <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-brown)', textDecoration: 'none', fontWeight: 700, marginBottom: '2rem', opacity: 0.6 }}>
+        <Link to="/store/cakeflow" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-brown)', textDecoration: 'none', fontWeight: 700, marginBottom: '2rem', opacity: 0.6 }}>
           <ChevronLeft size={20} /> Back to Home
         </Link>
         <div>

@@ -59,7 +59,7 @@ const CartPage = () => {
         <p style={{ color: 'var(--color-brown)', fontSize: '1.2rem', opacity: 0.7, marginBottom: '3rem', maxWidth: '400px' }}>
           Looks like you haven't added any treats yet. Let's find something delicious!
         </p>
-        <Link to="/" className="btn-primary" style={{ padding: '1.2rem 3rem', fontSize: '1.1rem', textDecoration: 'none' }}>
+        <Link to="/store/cakeflow" className="btn-primary" style={{ padding: '1.2rem 3rem', fontSize: '1.1rem', textDecoration: 'none' }}>
           Browse Cakes
         </Link>
       </div>
@@ -69,7 +69,7 @@ const CartPage = () => {
   return (
     <div style={{ padding: '60px 5% 6rem', maxWidth: '1400px', margin: '0 auto' }}>
       <header style={{ marginBottom: '4rem', marginTop: '60px' }}>
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-brown)', textDecoration: 'none', fontWeight: 700, marginBottom: '2rem', opacity: 0.6 }}>
+        <Link to="/store/cakeflow" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-brown)', textDecoration: 'none', fontWeight: 700, marginBottom: '2rem', opacity: 0.6 }}>
           <ChevronLeft size={20} /> Continue Shopping
         </Link>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
