@@ -88,8 +88,7 @@ const LandingPage = () => {
   const dripY3 = useTransform(scrollY, [0, 600], [0, 150]);
 
   return (
-    <div className="landing-page" style={{ paddingTop: '220px' }}>
-      <SaaSSandboxBanner businessId="cakeflow" />
+    <div className="landing-page" style={{ paddingTop: '80px' }}>
       
       {/* Dynamic Offer & Emergency Delivery Banners */}
       <div style={{ display: 'flex', flexDirection: 'column' }}>

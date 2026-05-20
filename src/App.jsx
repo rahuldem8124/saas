@@ -62,9 +62,9 @@ function App() {
       {isPlainCustomerRoute && <Navbar />}
       <main style={{ flex: 1 }}>
         <Routes>
-          <Route path="/" element={<SaaSPage />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/home" element={<Navigate to="/" replace />} />
-          <Route path="/store/cakeflow" element={<LandingPage />} />
+          <Route path="/store/cakeflow" element={<Navigate to="/" replace />} />
           <Route path="/birthday" element={<BirthdayPage />} />
           <Route path="/wedding" element={<WeddingPage />} />
           <Route path="/exclusives" element={<ExclusivesPage />} />
@@ -77,10 +77,10 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           
-          {/* SaaS Portal routes */}
-          <Route path="/saas" element={<SaaSPage />} />
-          <Route path="/store/:businessId" element={<TenantStorefront />} />
-          <Route path="/super-admin" element={<SuperAdminDashboard />} />
+          {/* SaaS Portal routes redirected to root */}
+          <Route path="/saas" element={<Navigate to="/" replace />} />
+          <Route path="/store/:businessId" element={<Navigate to="/" replace />} />
+          <Route path="/super-admin" element={<Navigate to="/" replace />} />
 
           {/* Admin Routes protected with ProtectedRoute wrapper */}
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />

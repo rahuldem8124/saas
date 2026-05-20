@@ -25,37 +25,18 @@ const Navbar = () => {
     setIsOpen(false);
   }, [location]);
 
-  const isRetailStore = 
-    location.pathname === '/birthday' || 
-    location.pathname === '/wedding' || 
-    location.pathname === '/exclusives' || 
-    location.pathname === '/custom' || 
-    location.pathname === '/cart' || 
-    location.pathname === '/checkout' || 
-    location.pathname === '/favorites' || 
-    location.pathname === '/profile' || 
-    location.pathname === '/tracking' || 
-    location.pathname.startsWith('/product/');
-
-  const isSaaSActive = !isRetailStore;
-
-  const navLinks = isSaaSActive ? [
-    { name: 'SaaS Platform', path: '/' },
-    { name: 'Bakery Demo', path: '/store/cakeflow' },
-    { name: 'Sneakers Demo', path: '/store/fastfoot' }
-  ] : [
-    { name: 'Home', path: '/store/cakeflow' },
+  const isRetailStore = true;
+  const isSaaSActive = false;
+  const navLinks = [
+    { name: 'Home', path: '/' },
     { name: 'Birthday', path: '/birthday' },
     { name: 'Wedding', path: '/wedding' },
     { name: 'Exclusives', path: '/exclusives' },
-    { name: 'Custom', path: '/custom' },
-    { name: 'SaaS Platform', path: '/' }
+    { name: 'Custom', path: '/custom' }
   ];
-
-  const isStorefront = location.pathname.startsWith('/store/');
-
-  const renderShopFlowNav = location.pathname === '/' || location.pathname.startsWith('/store/');
-  const renderCakeFlowNav = location.pathname === '/store/cakeflow' || isRetailStore;
+  const isStorefront = false;
+  const renderShopFlowNav = false;
+  const renderCakeFlowNav = true;
 
   return (
     <>
@@ -193,12 +174,11 @@ const Navbar = () => {
             
             <div className="hide-on-mobile" style={{ display: 'flex', gap: '2.5rem' }}>
               {[
-                { name: 'Home', path: '/store/cakeflow' },
+                { name: 'Home', path: '/' },
                 { name: 'Birthday', path: '/birthday' },
                 { name: 'Wedding', path: '/wedding' },
                 { name: 'Exclusives', path: '/exclusives' },
-                { name: 'Custom', path: '/custom' },
-                { name: 'SaaS Platform', path: '/' }
+                { name: 'Custom', path: '/custom' }
               ].map(link => (
                 <Link key={link.name} to={link.path} className="nav-link" style={{ 
                   fontWeight: 800, 
@@ -305,6 +285,24 @@ const Navbar = () => {
               <UserIcon size={26} color="var(--color-brown-dark)" />
             </Link>
 
+            {isAdmin && (
+              <Link to="/admin" className="hide-on-mobile" style={{ 
+                fontWeight: 950, 
+                color: 'white',
+                background: 'var(--gradient-pink)',
+                padding: '0.6rem 1.2rem',
+                borderRadius: 'var(--radius-xl)',
+                fontSize: '0.85rem',
+                boxShadow: 'var(--shadow-glow)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                textDecoration: 'none'
+              }}>
+                <Shield size={16} /> ADMIN PANEL
+              </Link>
+            )}
+
             <button 
               className="mobile-only" 
               onClick={() => setIsOpen(true)}
@@ -349,18 +347,13 @@ const Navbar = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {(renderCakeFlowNav ? [
-                  { name: 'Home', path: '/store/cakeflow' },
+                {[
+                  { name: 'Home', path: '/' },
                   { name: 'Birthday', path: '/birthday' },
                   { name: 'Wedding', path: '/wedding' },
                   { name: 'Exclusives', path: '/exclusives' },
-                  { name: 'Custom', path: '/custom' },
-                  { name: 'SaaS Platform', path: '/' }
-                ] : [
-                  { name: 'SaaS Platform', path: '/' },
-                  { name: 'Bakery Demo', path: '/store/cakeflow' },
-                  { name: 'Sneakers Demo', path: '/store/fastfoot' }
-                ]).map(link => (
+                  { name: 'Custom', path: '/custom' }
+                ].map(link => (
                   <Link 
                     key={link.name} 
                     to={link.path} 

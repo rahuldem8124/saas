@@ -198,8 +198,7 @@ const TenantStorefront = () => {
   const s = getThemeStyles();
 
   return (
-    <div style={{ background: '#ECEFF1', minHeight: '100vh', paddingTop: '150px', paddingBottom: '100px', fontFamily: s.font }}>
-      <SaaSSandboxBanner businessId={biz.id} />
+    <div style={{ background: '#ECEFF1', minHeight: '100vh', paddingTop: '80px', paddingBottom: '100px', fontFamily: s.font }}>
       
       {/* Dynamic Simulated Web Address Bar */}
       <div style={{ maxWidth: '600px', margin: '0 auto 2rem', background: '#37474F', color: 'white', borderRadius: '15px', padding: '0.8rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 10px 25px rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.05)' }}>

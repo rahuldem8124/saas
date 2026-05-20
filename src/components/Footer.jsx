@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 const Footer = () => {
   const location = useLocation();
-  const isSaaSActive = location.pathname === '/' || location.pathname === '/saas';
+  const isSaaSActive = false;
 
   if (isSaaSActive) {
     // Return high-tech slate-indigo SaaS footer
