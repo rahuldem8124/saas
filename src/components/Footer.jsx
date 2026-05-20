@@ -3,7 +3,12 @@ import { Link, useLocation } from 'react-router-dom';
 
 const Footer = () => {
   const location = useLocation();
-  const isSaaSActive = false;
+  const isStorefront = location.pathname.startsWith('/store');
+  const isSaaSActive = 
+    location.pathname.startsWith('/saas') || 
+    location.pathname.startsWith('/super-admin') || 
+    location.pathname.startsWith('/admin') || 
+    (isStorefront && !location.pathname.startsWith('/store/cakeflow'));
 
   if (isSaaSActive) {
     // Return high-tech slate-indigo SaaS footer
