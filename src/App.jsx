@@ -49,10 +49,9 @@ const ScrollToTop = () => {
 function App() {
   const location = useLocation();
   
-  // Hide Navbar and Footer for Admin Dashboards, Multi-Tenant Storefronts (except cakeflow flagship), and Super Admin dashboard
+  // Hide Navbar and Footer for Admin Dashboards and Super Admin dashboard
   const isPlainCustomerRoute = 
     !location.pathname.startsWith('/admin') && 
-    (!location.pathname.startsWith('/store') || location.pathname === '/store/cakeflow') && 
     !location.pathname.startsWith('/super-admin');
 
   console.log("App.jsx: Rendering application...", location.pathname);
