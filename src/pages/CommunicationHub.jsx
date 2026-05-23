@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, ShoppingBag, Users, DollarSign, BarChart2, Truck, Ticket, Settings as SettingsIcon, MessageSquare, Package, Eye, Send, Bot, Shield, Check, Info } from 'lucide-react';
+import AdminNavbar from '../components/AdminNavbar';
 
 const CommunicationHub = () => {
   const { user } = useAuth();
@@ -130,7 +131,7 @@ const CommunicationHub = () => {
 
       {/* Main Panel Content */}
       <main className="admin-main" style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
-        
+        <AdminNavbar />
         <header style={{ marginBottom: '3rem' }}>
           <h1 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '0.5rem' }}>Communication Hub</h1>
           <p style={{ color: 'var(--color-brown)', fontSize: '1.1rem', opacity: 0.8 }}>

@@ -10,10 +10,27 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showCakeDropdown, setShowCakeDropdown] = useState(false);
   const { cartCount } = useCart();
-  const { isAdmin } = useAuth();
+  const { isAdmin, switchRole } = useAuth();
   const { favorites } = useFavorites();
   const location = useLocation();
+  const profileDropdownRef = React.useRef(null);
+  const cakeProfileDropdownRef = React.useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+      if (cakeProfileDropdownRef.current && !cakeProfileDropdownRef.current.contains(event.target)) {
+        setShowCakeDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -31,7 +48,7 @@ const Navbar = () => {
     location.pathname.startsWith('/saas') || 
     location.pathname.startsWith('/super-admin') || 
     location.pathname.startsWith('/admin') || 
-    (isStorefront && !location.pathname.startsWith('/store/cakeflow'));
+    (isStorefront && !location.pathname.startsWith('/store/cakeflow-legacy'));
   
   const isRetailStore = !isSaaSActive;
   const navLinks = [
@@ -41,8 +58,13 @@ const Navbar = () => {
     { name: 'Exclusives', path: '/exclusives' },
     { name: 'Custom', path: '/custom' }
   ];
-  const renderShopFlowNav = true;
-  const renderCakeFlowNav = !isSaaSActive;
+  const queryParams = new URLSearchParams(location.search);
+  const fromSaaS = queryParams.get('from') === 'saas';
+  
+  const isProfilePage = location.pathname === '/profile';
+  
+  const renderShopFlowNav = isProfilePage ? fromSaaS : true;
+  const renderCakeFlowNav = isProfilePage ? !fromSaaS : !isSaaSActive;
 
   return (
     <>
@@ -50,7 +72,8 @@ const Navbar = () => {
       {renderShopFlowNav && (
         <nav style={{
           position: 'fixed',
-          top: isStorefront ? '52px' : 0,
+          top: 0,
+          left: 0,
           width: '100%',
           zIndex: 2000,
           padding: scrolled ? '0.6rem 5%' : '1.2rem 5%',
@@ -98,9 +121,113 @@ const Navbar = () => {
           </div>
 
           <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-            <Link to="/profile" className="hide-on-mobile">
-              <UserIcon size={26} color="#475569" />
-            </Link>
+            <div 
+              ref={profileDropdownRef}
+              className="hide-on-mobile"
+              onMouseEnter={() => setShowDropdown(true)}
+              onMouseLeave={() => setShowDropdown(false)}
+              onClick={() => setShowDropdown(true)}
+              style={{ position: 'relative', padding: '0.5rem 0', cursor: 'pointer' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <UserIcon size={26} color="#475569" />
+              </div>
+              
+              <AnimatePresence>
+                {showDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      width: '200px',
+                      background: 'white',
+                      border: '1px solid #E2E8F0',
+                      borderRadius: '16px',
+                      padding: '0.8rem',
+                      boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
+                      zIndex: 3000,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.4rem'
+                    }}
+                  >
+                    <span style={{ fontSize: '0.7rem', color: '#64748B', fontWeight: 800, textTransform: 'uppercase', padding: '0.4rem 0.6rem 0.2rem', borderBottom: '1px solid #F1F5F9', display: 'block', textAlign: 'left' }}>
+                      Quick Actions
+                    </span>
+                    <Link 
+                      to="/profile?from=saas" 
+                      style={{ 
+                        padding: '0.6rem 0.8rem', 
+                        borderRadius: '8px', 
+                        color: '#0F172A', 
+                        fontWeight: 700, 
+                        fontSize: '0.9rem', 
+                        textDecoration: 'none', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.6rem', 
+                        transition: 'background 0.2s',
+                        textAlign: 'left'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#F1F5F9'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                      <UserIcon size={14} /> My Profile
+                    </Link>
+                    <div 
+                      onClick={() => {
+                        switchRole('admin');
+                        window.location.href = '/admin';
+                      }}
+                      style={{ 
+                        padding: '0.6rem 0.8rem', 
+                        borderRadius: '8px', 
+                        color: '#0F172A', 
+                        fontWeight: 700, 
+                        fontSize: '0.9rem', 
+                        cursor: 'pointer', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.6rem', 
+                        transition: 'background 0.2s',
+                        textAlign: 'left'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#F1F5F9'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                      <Shield size={14} color="#4F46E5" /> Tenant Admin
+                    </div>
+                    <div 
+                      onClick={() => {
+                        switchRole('admin');
+                        window.location.href = '/super-admin';
+                      }}
+                      style={{ 
+                        padding: '0.6rem 0.8rem', 
+                        borderRadius: '8px', 
+                        color: '#0F172A', 
+                        fontWeight: 700, 
+                        fontSize: '0.9rem', 
+                        cursor: 'pointer', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.6rem', 
+                        transition: 'background 0.2s',
+                        textAlign: 'left'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = '#F1F5F9'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                      <Shield size={14} color="#0F172A" /> Super Admin
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {isAdmin && (
               <div style={{ display: 'flex', gap: '8px' }}>
@@ -153,6 +280,7 @@ const Navbar = () => {
         <nav style={{
           position: 'fixed',
           top: renderShopFlowNav ? (scrolled ? '71px' : '89px') : 0,
+          left: 0,
           width: '100%',
           zIndex: 1999,
           padding: scrolled ? '0.6rem 5%' : '1.2rem 5%',
@@ -288,9 +416,113 @@ const Navbar = () => {
               )}
             </Link>
             
-            <Link to="/profile" className="hide-on-mobile">
-              <UserIcon size={26} color="var(--color-brown-dark)" />
-            </Link>
+            <div 
+              ref={cakeProfileDropdownRef}
+              className="hide-on-mobile"
+              onMouseEnter={() => setShowCakeDropdown(true)}
+              onMouseLeave={() => setShowCakeDropdown(false)}
+              onClick={() => setShowCakeDropdown(true)}
+              style={{ position: 'relative', padding: '0.5rem 0', cursor: 'pointer' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <UserIcon size={26} color="var(--color-brown-dark)" />
+              </div>
+              
+              <AnimatePresence>
+                {showCakeDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      width: '200px',
+                      background: 'white',
+                      border: '1px solid rgba(122, 78, 58, 0.15)',
+                      borderRadius: '16px',
+                      padding: '0.8rem',
+                      boxShadow: '0 10px 25px rgba(122, 78, 58, 0.08)',
+                      zIndex: 3000,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.4rem'
+                    }}
+                  >
+                    <span style={{ fontSize: '0.7rem', color: 'var(--color-brown)', fontWeight: 800, textTransform: 'uppercase', padding: '0.4rem 0.6rem 0.2rem', borderBottom: '1px solid rgba(122, 78, 58, 0.08)', display: 'block', textAlign: 'left' }}>
+                      Quick Actions
+                    </span>
+                    <Link 
+                      to="/profile?from=store" 
+                      style={{ 
+                        padding: '0.6rem 0.8rem', 
+                        borderRadius: '8px', 
+                        color: 'var(--color-brown-dark)', 
+                        fontWeight: 700, 
+                        fontSize: '0.9rem', 
+                        textDecoration: 'none', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.6rem', 
+                        transition: 'background 0.2s',
+                        textAlign: 'left'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-cream)'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                      <UserIcon size={14} color="var(--color-pink)" /> My Profile
+                    </Link>
+                    <div 
+                      onClick={() => {
+                        switchRole('admin');
+                        window.location.href = '/admin';
+                      }}
+                      style={{ 
+                        padding: '0.6rem 0.8rem', 
+                        borderRadius: '8px', 
+                        color: 'var(--color-brown-dark)', 
+                        fontWeight: 700, 
+                        fontSize: '0.9rem', 
+                        cursor: 'pointer', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.6rem', 
+                        transition: 'background 0.2s',
+                        textAlign: 'left'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-cream)'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                      <Shield size={14} color="var(--color-pink)" /> Tenant Admin
+                    </div>
+                    <div 
+                      onClick={() => {
+                        switchRole('admin');
+                        window.location.href = '/super-admin';
+                      }}
+                      style={{ 
+                        padding: '0.6rem 0.8rem', 
+                        borderRadius: '8px', 
+                        color: 'var(--color-brown-dark)', 
+                        fontWeight: 700, 
+                        fontSize: '0.9rem', 
+                        cursor: 'pointer', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '0.6rem', 
+                        transition: 'background 0.2s',
+                        textAlign: 'left'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-cream)'}
+                      onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                      <Shield size={14} color="var(--color-brown-dark)" /> Super Admin
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {isAdmin && (
               <Link to="/admin" className="hide-on-mobile" style={{ 
@@ -422,7 +654,7 @@ const Navbar = () => {
           <MapPin size={22} />
           <span>Track</span>
         </Link>
-        <Link to="/profile" className={location.pathname === '/profile' ? 'active' : ''}>
+        <Link to="/profile?from=store" className={location.pathname === '/profile' ? 'active' : ''}>
           <UserIcon size={22} />
           <span>Profile</span>
         </Link>

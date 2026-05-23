@@ -4,10 +4,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
+import AdminNavbar from '../components/AdminNavbar';
 
 const AdminDashboard = () => {
   const { user, switchRole } = useAuth();
-  const { businesses, selectBusiness } = useTenant();
+  const { businesses, selectBusiness, updateBusiness, topUpMessageQuota, PLAN_LIMITS } = useTenant();
   const location = useLocation();
 
   const activeBizId = user?.businessId || 'cakeflow';
@@ -182,6 +183,7 @@ const AdminDashboard = () => {
 
       {/* Main Content Area */}
       <main className="admin-main" style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem' }}>
+        <AdminNavbar />
         
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
           <div>
@@ -197,6 +199,221 @@ const AdminDashboard = () => {
             <Link to="/admin/products" className="btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '1.05rem', textDecoration: 'none' }}>+ Add Scoped Product</Link>
           </div>
         </header>
+
+        {/* Automated Social Messaging Hub */}
+        <section className="card" style={{ 
+          background: 'white', 
+          padding: '2.5rem', 
+          borderRadius: '24px', 
+          boxShadow: '0 4px 20px rgba(0,0,0,0.01)', 
+          border: '1px solid rgba(122, 78, 58, 0.1)', 
+          marginBottom: '4rem' 
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid #F3F4F6', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
+            <div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(242, 140, 163, 0.1)', color: 'var(--color-pink)', padding: '4px 12px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 900, marginBottom: '0.5rem' }}>
+                <MessageSquare size={12} /> AUTOMATED SOCIAL MESSAGING HUB
+              </div>
+              <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--color-brown-dark)', margin: 0 }}>Social Automation Bot Engine</h2>
+              <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: 'var(--color-brown)', opacity: 0.7, fontWeight: 600 }}>Configure active channel automation, check subscription quotas, and refill credits instantly.</p>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-brown-dark)' }}>Active Subscription:</span>
+              <span style={{ background: 'var(--color-brown-dark)', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 900 }}>
+                {biz.subscription} Plan
+              </span>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '3rem', flexWrap: 'wrap' }}>
+            {/* Left Side: Channel Selector & Dynamic Pricing */}
+            <div style={{ borderRight: '1px solid #F3F4F6', paddingRight: '3rem' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--color-brown-dark)', marginBottom: '1rem' }}>1. Select Automation Channel</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--color-brown)', opacity: 0.8, marginBottom: '1.5rem', fontWeight: 600 }}>
+                Choose the social media channels through which your customers receive automated order confirmations, receipts, and customer service chats.
+              </p>
+
+              {/* Toggles */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                {[
+                  { channel: "WhatsApp", cost: 0.01, label: "WhatsApp Bot Automation", desc: "Send automated messages to WhatsApp numbers.", icon: "🟢", bg: 'rgba(16, 185, 129, 0.04)', border: 'rgba(16, 185, 129, 0.15)', activeColor: '#10B981' },
+                  { channel: "Instagram", cost: 0.008, label: "Instagram Direct Automation", desc: "Interact via Instagram direct messages and comments.", icon: "🔵", bg: 'rgba(59, 130, 246, 0.04)', border: 'rgba(59, 130, 246, 0.15)', activeColor: '#3B82F6' },
+                  { channel: "WhatsApp + Instagram", cost: 0.015, label: "Multi-Channel Automation (Both)", desc: "Synchronize both platforms under a single bot.", icon: "🟣", bg: 'rgba(139, 92, 246, 0.04)', border: 'rgba(139, 92, 246, 0.15)', activeColor: '#8B5CF6' }
+                ].map((tier) => {
+                  const isActive = (biz.automationChannel || "WhatsApp") === tier.channel;
+                  return (
+                    <div 
+                      key={tier.channel}
+                      onClick={() => {
+                        updateBusiness(activeBizId, { 
+                          automationChannel: tier.channel, 
+                          perMessageCost: tier.cost 
+                        });
+                      }}
+                      style={{
+                        padding: '1.2rem 1.5rem',
+                        borderRadius: '16px',
+                        background: isActive ? tier.bg : 'white',
+                        border: `2px solid ${isActive ? tier.activeColor : 'rgba(0,0,0,0.05)'}`,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.02)' : 'none'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <span style={{ fontSize: '1.5rem' }}>{tier.icon}</span>
+                        <div>
+                          <div style={{ fontWeight: 800, color: 'var(--color-brown-dark)', fontSize: '0.95rem' }}>{tier.label}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--color-brown)', opacity: 0.7, fontWeight: 500 }}>{tier.desc}</div>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <span style={{ display: 'block', fontSize: '0.95rem', fontWeight: 900, color: isActive ? tier.activeColor : 'var(--color-brown-dark)' }}>
+                          ${tier.cost.toFixed(3)}
+                        </span>
+                        <span style={{ fontSize: '0.65rem', color: 'var(--color-brown)', opacity: 0.5, fontWeight: 700 }}>PER MESSAGE</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Simulated Billing Projection */}
+              <div style={{ background: 'var(--color-cream)', padding: '1.5rem', borderRadius: '16px', border: '1px dashed rgba(122, 78, 58, 0.15)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--color-pink)', fontWeight: 900, textTransform: 'uppercase', display: 'block' }}>SIMULATED ACCRUED BILLING</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--color-brown-dark)', fontWeight: 800 }}>Total messages automated: {biz.messagesUsed || 0}</span>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 950, color: 'var(--color-brown-dark)' }}>
+                      ${((biz.messagesUsed || 0) * (biz.perMessageCost || 0.01)).toFixed(2)}
+                    </div>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--color-brown)', opacity: 0.6, fontWeight: 800 }}>ESTIMATED COST</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side: Quotas, Remaining limit, Top up */}
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--color-brown-dark)', marginBottom: '1rem' }}>2. Subscription Quota & Used</h3>
+                
+                {/* Quota limit bars */}
+                {(() => {
+                  const limits = PLAN_LIMITS[biz.subscription] || PLAN_LIMITS['Basic'];
+                  const orderCount = orders.length;
+                  const orderLimit = limits.orders;
+                  const isOrdersUnlimited = orderLimit === Infinity;
+                  const ordersPercent = isOrdersUnlimited ? 0 : Math.min((orderCount / orderLimit) * 100, 100);
+
+                  const msgUsed = biz.messagesUsed || 0;
+                  const baseMsgLimit = limits.messages;
+                  const topUpCount = biz.topUpMessages || 0;
+                  const isMessagesUnlimited = baseMsgLimit === Infinity;
+                  const msgLimit = isMessagesUnlimited ? Infinity : baseMsgLimit + topUpCount;
+                  const msgRemaining = isMessagesUnlimited ? Infinity : Math.max(msgLimit - msgUsed, 0);
+                  const msgPercent = isMessagesUnlimited ? 0 : Math.min((msgUsed / msgLimit) * 100, 100);
+
+                  const isLowOnMessages = !isMessagesUnlimited && (msgRemaining / msgLimit) < 0.15;
+
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.8rem' }}>
+                      {/* Orders limit bar */}
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-brown-dark)', marginBottom: '0.5rem' }}>
+                          <span>Orders Processed: {orderCount} / {isOrdersUnlimited ? '∞' : orderLimit}</span>
+                          <span style={{ color: 'var(--color-pink)' }}>
+                            {isOrdersUnlimited ? 'Unlimited' : `${ordersPercent.toFixed(0)}%`}
+                          </span>
+                        </div>
+                        <div style={{ width: '100%', height: '8px', background: 'var(--color-cream)', borderRadius: '4px', overflow: 'hidden' }}>
+                          <div style={{ width: `${isOrdersUnlimited ? 100 : ordersPercent}%`, height: '100%', background: 'var(--gradient-pink)', borderRadius: '4px' }} />
+                        </div>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--color-brown)', opacity: 0.6, fontWeight: 700, display: 'block', marginTop: '4px' }}>
+                          Quota resets at the start of your monthly billing cycle.
+                        </span>
+                      </div>
+
+                      {/* Messages limit bar */}
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-brown-dark)', marginBottom: '0.5rem' }}>
+                          <span>Messages Automated: {msgUsed} / {isMessagesUnlimited ? '∞' : msgLimit}</span>
+                          <span style={{ color: isLowOnMessages ? '#EF4444' : '#10B981' }}>
+                            {isMessagesUnlimited ? 'Unlimited' : `${msgPercent.toFixed(0)}%`}
+                          </span>
+                        </div>
+                        <div style={{ width: '100%', height: '8px', background: 'var(--color-cream)', borderRadius: '4px', overflow: 'hidden' }}>
+                          <div style={{ width: `${isMessagesUnlimited ? 100 : msgPercent}%`, height: '100%', background: isMessagesUnlimited ? '#10B981' : isLowOnMessages ? '#EF4444' : '#10B981', borderRadius: '4px' }} />
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--color-brown)', opacity: 0.6, fontWeight: 700 }}>
+                            {biz.topUpMessages > 0 ? `Includes +${biz.topUpMessages} top-up credits.` : 'Base plan allotment active.'}
+                          </span>
+                          <span style={{ 
+                            fontSize: '0.85rem', 
+                            fontWeight: 900, 
+                            color: isLowOnMessages ? '#EF4444' : 'var(--color-brown-dark)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            {isLowOnMessages && "⚠️"} {isMessagesUnlimited ? 'Unlimited' : `${msgRemaining.toLocaleString()} remaining`}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Refill credits action */}
+              <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #F3F4F6' }}>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--color-brown-dark)', margin: '0 0 0.8rem' }}>3. Refill Message Credits</h4>
+                <p style={{ fontSize: '0.75rem', color: 'var(--color-brown)', opacity: 0.7, margin: '0 0 1rem', fontWeight: 600 }}>
+                  Need more messaging capacity? Top up your account instantly. Refilled credits do not expire and carry over monthly.
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem' }}>
+                  {[
+                    { amount: 500, label: "+500 Msgs", desc: "$5.00" },
+                    { amount: 1000, label: "+1k Msgs", desc: "$9.00" },
+                    { amount: 5000, label: "+5k Msgs", desc: "$40.00" }
+                  ].map((pkg) => (
+                    <button
+                      key={pkg.amount}
+                      onClick={() => {
+                        topUpMessageQuota(activeBizId, pkg.amount);
+                        alert(`🎉 Successfully added +${pkg.amount.toLocaleString()} social messaging credits to ${biz.name}!`);
+                      }}
+                      className="btn-secondary touch-friendly"
+                      style={{
+                        padding: '0.6rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '12px',
+                        border: '1px solid rgba(122, 78, 58, 0.2)',
+                        background: 'white',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        gap: '2px'
+                      }}
+                    >
+                      <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-brown-dark)' }}>{pkg.label}</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--color-pink)', fontWeight: 800 }}>{pkg.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* -------------------- CAKE BUSINESS DASHBOARD -------------------- */}
         {biz.category === 'Cake' && (

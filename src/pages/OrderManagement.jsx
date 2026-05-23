@@ -3,6 +3,7 @@ import { ShoppingBag, ChevronLeft, Search, Filter, MoreVertical, Download, Eye, 
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
 import { Link, useLocation } from 'react-router-dom';
+import AdminNavbar from '../components/AdminNavbar';
 
 const OrderManagement = () => {
   const { user } = useAuth();
@@ -90,6 +91,7 @@ const OrderManagement = () => {
       </aside>
 
       <main className="admin-main" style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
+        <AdminNavbar />
         <header style={{ marginBottom: '4rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '1rem' }}>
             <Link to="/admin" style={{ color: 'var(--color-brown)', background: 'white', padding: '0.5rem', borderRadius: '50%', boxShadow: 'var(--shadow-soft)' }}><ChevronLeft size={24} /></Link>

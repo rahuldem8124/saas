@@ -60,7 +60,7 @@ function App() {
     location.pathname.startsWith('/saas') || 
     location.pathname.startsWith('/super-admin') || 
     location.pathname.startsWith('/admin') || 
-    (isStorefront && !location.pathname.startsWith('/store/cakeflow'));
+    (isStorefront && !location.pathname.startsWith('/store/cakeflow-legacy'));
   
   const hasBothNavbars = isPlainCustomerRoute && !isSaaSActive;
 
@@ -69,12 +69,13 @@ function App() {
   return (
     <div className="app-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <ScrollToTop />
-      {isPlainCustomerRoute && <Navbar />}
+      {(isPlainCustomerRoute || location.pathname.startsWith('/super-admin')) && <Navbar />}
       <main style={{ flex: 1, paddingTop: hasBothNavbars ? '89px' : '0px' }}>
         <Routes>
           <Route path="/" element={<SaaSPage />} />
           <Route path="/home" element={<Navigate to="/" replace />} />
-          <Route path="/store/cakeflow" element={<LandingPage />} />
+          <Route path="/store/cakeflow-legacy" element={<LandingPage />} />
+          <Route path="/store/cakeflow" element={<TenantStorefront />} />
           <Route path="/birthday" element={<BirthdayPage />} />
           <Route path="/wedding" element={<WeddingPage />} />
           <Route path="/exclusives" element={<ExclusivesPage />} />

@@ -6,13 +6,14 @@ import { Shield, Users, BarChart2, DollarSign, ArrowLeft, ToggleLeft, ToggleRigh
 import { motion } from 'framer-motion';
 
 const SuperAdminDashboard = () => {
-  const { businesses, updateBusiness } = useTenant();
+  const { businesses, updateBusiness, PLAN_LIMITS, topUpMessageQuota } = useTenant();
   const { switchRole } = useAuth();
   const navigate = useNavigate();
 
   const bizList = Object.values(businesses);
+  const [selectedService, setSelectedService] = useState('All');
 
-  // Compute platform MRR
+  // Compute platform MRR based on all businesses
   const mrrSum = bizList.reduce((sum, b) => {
     const fee = b.subscription === 'Premium' ? 199 : b.subscription === 'Pro' ? 79 : 29;
     return sum + fee;
@@ -27,8 +28,13 @@ const SuperAdminDashboard = () => {
     alert(`Store status for ${bizId} updated to: ${newStatus}`);
   };
 
+  // Filter businesses by selected service/category
+  const filteredBizList = selectedService === 'All'
+    ? bizList
+    : bizList.filter(b => b.category?.toLowerCase() === selectedService.toLowerCase());
+
   return (
-    <div style={{ background: '#F3F4F6', minHeight: '100vh', padding: '60px 5% 120px', boxSizing: 'border-box' }}>
+    <div style={{ background: '#F3F4F6', minHeight: '100vh', padding: '130px 5% 120px', boxSizing: 'border-box' }}>
       
       {/* Header */}
       <header style={{ maxWidth: '1200px', margin: '0 auto 4rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -75,33 +81,165 @@ const SuperAdminDashboard = () => {
       {/* Sellers List Table */}
       <section style={{ maxWidth: '1200px', margin: '0 auto 4rem' }}>
         <div className="card" style={{ background: 'white', padding: '3rem', borderRadius: '30px', boxShadow: '0 10px 30px rgba(0,0,0,0.02)' }}>
-          <h2 style={{ fontSize: '1.6rem', fontWeight: 900, marginBottom: '2rem' }}>Registered Social Stores</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+            <h2 style={{ fontSize: '1.6rem', fontWeight: 900, margin: 0 }}>Registered Social Stores</h2>
+            <div style={{ fontSize: '0.8rem', background: 'var(--color-cream)', color: 'var(--color-brown-dark)', padding: '6px 12px', borderRadius: '10px', fontWeight: 800 }}>
+              Showing {filteredBizList.length} of {bizList.length} Stores
+            </div>
+          </div>
+
+          {/* Service Filters */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '2.5rem', borderBottom: '1px solid #ECEFF1', paddingBottom: '1.5rem' }}>
+            {['All', 'Cake', 'Shoes', 'Clothing', 'Accessories', 'Handmade', 'Custom'].map(cat => {
+              const count = bizList.filter(b => cat === 'All' ? true : b.category?.toLowerCase() === cat.toLowerCase()).length;
+              const isActive = selectedService === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedService(cat)}
+                  style={{
+                    padding: '0.6rem 1.4rem',
+                    borderRadius: '100px',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    border: 'none',
+                    background: isActive ? 'var(--color-brown-dark)' : '#ECEFF1',
+                    color: isActive ? 'white' : 'var(--color-brown)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s ease',
+                    boxShadow: isActive ? '0 4px 10px rgba(74, 44, 42, 0.15)' : 'none'
+                  }}
+                >
+                  <span>{cat}</span>
+                  <span style={{ 
+                    fontSize: '0.7rem', 
+                    background: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.06)', 
+                    color: isActive ? 'white' : 'var(--color-brown-dark)',
+                    padding: '2px 6px',
+                    borderRadius: '20px',
+                    fontWeight: 800
+                  }}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
           <div className="table-responsive" style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid #F3F4F6', textAlign: 'left' }}>
                   <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Store Name</th>
-                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Vanity Domain</th>
-                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Category</th>
-                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Sub Tier</th>
-                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>MRR Share</th>
+                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Subscription & Category</th>
+                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Automation Channel</th>
+                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Per-Msg Rate</th>
+                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Orders Processed</th>
+                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Message Quota</th>
+                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Simulated Billing</th>
                   <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>License Status</th>
-                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Actions</th>
+                  <th style={{ padding: '1rem', fontWeight: 800, color: 'var(--color-brown)' }}>Refills & Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {bizList.map(b => {
-                  const subFee = b.subscription === 'Premium' ? 199 : b.subscription === 'Pro' ? 79 : 29;
+                {filteredBizList.map(b => {
                   const isSuspended = b.approvalStatus === 'Suspended';
+
+                  const subscription = b.subscription || 'Basic';
+                  const limits = PLAN_LIMITS[subscription] || PLAN_LIMITS['Basic'];
+
+                  const orderCount = b.orders ? b.orders.length : 0;
+                  const orderLimit = limits.orders;
+                  const isOrdersUnlimited = orderLimit === Infinity;
+                  const ordersPercent = isOrdersUnlimited ? 0 : Math.min((orderCount / orderLimit) * 100, 100);
+
+                  const msgUsed = b.messagesUsed || 0;
+                  const baseMsgLimit = limits.messages;
+                  const topUpCount = b.topUpMessages || 0;
+                  const isMessagesUnlimited = baseMsgLimit === Infinity;
+                  const msgLimit = isMessagesUnlimited ? Infinity : baseMsgLimit + topUpCount;
+                  const msgRemaining = isMessagesUnlimited ? Infinity : Math.max(msgLimit - msgUsed, 0);
+                  const msgPercent = isMessagesUnlimited ? 0 : Math.min((msgUsed / msgLimit) * 100, 100);
+                  
+                  const isLowOnMessages = !isMessagesUnlimited && (msgRemaining / msgLimit) < 0.15;
+
+                  const channel = b.automationChannel || "WhatsApp";
+                  const rate = b.perMessageCost || 0.01;
+                  const billingValue = msgUsed * rate;
+
                   return (
                     <tr key={b.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
-                      <td style={{ padding: '1.2rem 1rem', fontWeight: 900, color: 'var(--color-brown-dark)' }}>{b.name}</td>
-                      <td style={{ padding: '1.2rem 1rem', fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-pink)' }}>{b.id}.platform.com</td>
                       <td style={{ padding: '1.2rem 1rem' }}>
-                        <span style={{ fontSize: '0.75rem', background: '#ECEFF1', padding: '3px 10px', borderRadius: '12px', fontWeight: 900 }}>{b.category}</span>
+                        <div style={{ fontWeight: 900, color: 'var(--color-brown-dark)' }}>{b.name}</div>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-pink)' }}>{b.id}.platform.com</div>
                       </td>
-                      <td style={{ padding: '1.2rem 1rem', fontWeight: 800 }}>{b.subscription}</td>
-                      <td style={{ padding: '1.2rem 1rem', fontWeight: 800, color: 'var(--color-brown)' }}>${subFee}.00</td>
+                      <td style={{ padding: '1.2rem 1rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-brown-dark)' }}>{b.subscription}</span>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--color-brown)', opacity: 0.6, fontWeight: 700 }}>{b.category}</span>
+                        </div>
+                      </td>
+                      <td style={{ padding: '1.2rem 1rem' }}>
+                        <span style={{
+                          padding: '4px 10px',
+                          borderRadius: '8px',
+                          fontSize: '0.75rem',
+                          fontWeight: 800,
+                          background: channel === 'WhatsApp' ? 'rgba(16, 185, 129, 0.1)' : channel === 'Instagram' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(139, 92, 246, 0.1)',
+                          color: channel === 'WhatsApp' ? '#10B981' : channel === 'Instagram' ? '#3B82F6' : '#8B5CF6',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }} />
+                          {channel}
+                        </span>
+                      </td>
+                      <td style={{ padding: '1.2rem 1rem', fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-brown-dark)' }}>
+                        ${rate.toFixed(3)}
+                      </td>
+                      <td style={{ padding: '1.2rem 1rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', width: '100px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-brown-dark)', marginBottom: '4px' }}>
+                            <span>{orderCount} / {isOrdersUnlimited ? '∞' : orderLimit}</span>
+                          </div>
+                          <div style={{ width: '100%', height: '4px', background: '#ECEFF1', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{
+                              width: `${isOrdersUnlimited ? 100 : ordersPercent}%`,
+                              height: '100%',
+                              background: 'var(--gradient-pink)',
+                              borderRadius: '2px'
+                            }} />
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '1.2rem 1rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', width: '120px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-brown-dark)', marginBottom: '4px' }}>
+                            <span>{msgUsed} / {isMessagesUnlimited ? '∞' : msgLimit}</span>
+                          </div>
+                          <div style={{ width: '100%', height: '4px', background: '#ECEFF1', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{
+                              width: `${isMessagesUnlimited ? 100 : msgPercent}%`,
+                              height: '100%',
+                              background: isMessagesUnlimited ? '#10B981' : isLowOnMessages ? '#EF4444' : '#10B981',
+                              borderRadius: '2px'
+                            }} />
+                          </div>
+                          <div style={{ fontSize: '0.7rem', color: isLowOnMessages ? '#EF4444' : '#6B7280', marginTop: '2px', fontWeight: 600 }}>
+                            {isLowOnMessages ? '⚠️ Low' : `${msgRemaining.toLocaleString()} remaining`}
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '1.2rem 1rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontSize: '0.9rem', fontWeight: 900, color: 'var(--color-brown-dark)' }}>${billingValue.toFixed(2)}</span>
+                          <span style={{ fontSize: '0.65rem', color: 'var(--color-pink)', fontWeight: 800 }}>BILLABLE MSG FEE</span>
+                        </div>
+                      </td>
                       <td style={{ padding: '1.2rem 1rem' }}>
                         <span style={{
                           padding: '4px 12px',
@@ -115,21 +253,78 @@ const SuperAdminDashboard = () => {
                         </span>
                       </td>
                       <td style={{ padding: '1.2rem 1rem' }}>
-                        <button 
-                          onClick={() => handleToggleApproval(b.id, b.approvalStatus)}
-                          style={{
-                            padding: '4px 12px',
-                            borderRadius: '8px',
-                            fontSize: '0.75rem',
-                            fontWeight: 800,
-                            border: 'none',
-                            background: isSuspended ? '#4CAF50' : '#F44336',
-                            color: 'white',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {isSuspended ? "APPROVE" : "SUSPEND"}
-                        </button>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {!isMessagesUnlimited ? (
+                            <div style={{ display: 'flex', gap: '4px' }}>
+                              <button
+                                onClick={() => topUpMessageQuota(b.id, 500)}
+                                className="touch-friendly"
+                                style={{
+                                  padding: '3px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '0.7rem',
+                                  fontWeight: 800,
+                                  border: '1px solid rgba(122, 78, 58, 0.15)',
+                                  background: 'white',
+                                  color: 'var(--color-brown-dark)',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                +500
+                              </button>
+                              <button
+                                onClick={() => topUpMessageQuota(b.id, 1000)}
+                                className="touch-friendly"
+                                style={{
+                                  padding: '3px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '0.7rem',
+                                  fontWeight: 800,
+                                  border: '1px solid rgba(122, 78, 58, 0.15)',
+                                  background: 'white',
+                                  color: 'var(--color-brown-dark)',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                +1k
+                              </button>
+                              <button
+                                onClick={() => topUpMessageQuota(b.id, 5000)}
+                                className="touch-friendly"
+                                style={{
+                                  padding: '3px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '0.7rem',
+                                  fontWeight: 800,
+                                  border: '1px solid var(--color-pink)',
+                                  background: 'rgba(242, 140, 163, 0.05)',
+                                  color: 'var(--color-pink)',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                +5k
+                              </button>
+                            </div>
+                          ) : (
+                            <span style={{ fontSize: '0.75rem', color: '#10B981', fontWeight: 800 }}>Unlimited Msgs</span>
+                          )}
+                          <button 
+                            onClick={() => handleToggleApproval(b.id, b.approvalStatus)}
+                            style={{
+                              padding: '4px 12px',
+                              borderRadius: '8px',
+                              fontSize: '0.75rem',
+                              fontWeight: 800,
+                              border: 'none',
+                              background: isSuspended ? '#4CAF50' : '#F44336',
+                              color: 'white',
+                              cursor: 'pointer',
+                              width: 'fit-content'
+                            }}
+                          >
+                            {isSuspended ? "APPROVE LICENSE" : "SUSPEND LICENSE"}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

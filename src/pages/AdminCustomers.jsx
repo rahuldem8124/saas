@@ -3,6 +3,7 @@ import { Users, LayoutDashboard, ShoppingBag, Package, DollarSign, BarChart2, Tr
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
+import AdminNavbar from '../components/AdminNavbar';
 
 const AdminCustomers = () => {
   const { user, switchRole } = useAuth();
@@ -66,6 +67,7 @@ const AdminCustomers = () => {
       </aside>
 
       <main style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
+        <AdminNavbar />
         <header style={{ marginBottom: '4rem' }}>
           <h1 style={{ fontSize: '3rem', fontWeight: 800 }}>Customer Directory</h1>
           <p style={{ color: 'var(--color-brown)', fontSize: '1.1rem', opacity: 0.8 }}>Manage your customers and their preferences.</p>

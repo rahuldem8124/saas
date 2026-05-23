@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
 import { Lock, Sparkles, CreditCard, Check, ShieldCheck, Zap, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Navbar from './Navbar';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -78,17 +79,19 @@ const ProtectedRoute = ({ children }) => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'radial-gradient(circle at 10% 20%, rgba(255, 230, 235, 0.4) 0%, rgba(230, 240, 255, 0.4) 90%), #FFF8F3',
-      padding: '4rem 2rem',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      boxSizing: 'border-box',
-      fontFamily: "'Outfit', sans-serif"
-    }}>
+    <>
+      <Navbar />
+      <div style={{
+        minHeight: '100vh',
+        background: 'radial-gradient(circle at 10% 20%, rgba(255, 230, 235, 0.4) 0%, rgba(230, 240, 255, 0.4) 90%), #FFF8F3',
+        padding: '8rem 2rem 4rem',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxSizing: 'border-box',
+        fontFamily: "'Outfit', sans-serif"
+      }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -304,6 +307,7 @@ const ProtectedRoute = ({ children }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -9,7 +9,7 @@ const Footer = () => {
     location.pathname.startsWith('/saas') || 
     location.pathname.startsWith('/super-admin') || 
     location.pathname.startsWith('/admin') || 
-    (isStorefront && !location.pathname.startsWith('/store/cakeflow'));
+    (isStorefront && !location.pathname.startsWith('/store/cakeflow-legacy'));
 
   if (isSaaSActive) {
     // Return high-tech slate-indigo SaaS footer

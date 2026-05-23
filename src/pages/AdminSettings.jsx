@@ -3,6 +3,7 @@ import { Settings as SettingsIcon, LayoutDashboard, ShoppingBag, Package, Users,
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
+import AdminNavbar from '../components/AdminNavbar';
 
 const AdminSettings = () => {
   const { user, switchRole } = useAuth();
@@ -138,6 +139,7 @@ const AdminSettings = () => {
 
       {/* Main Panel */}
       <main className="admin-main" style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
+        <AdminNavbar />
         <header style={{ marginBottom: '4rem' }}>
           <h1 style={{ fontSize: '3rem', fontWeight: 900 }}>System Settings</h1>
           <p style={{ color: 'var(--color-brown)', fontSize: '1.1rem', opacity: 0.8 }}>Configure custom checkout forms, subscription parameters, and scopes.</p>

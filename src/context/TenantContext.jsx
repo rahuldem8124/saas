@@ -12,9 +12,13 @@ const initialBusinesses = {
     theme: "Luxury",
     subscription: "Pro",
     isSubscribed: false,
+    messagesUsed: 385,
+    topUpMessages: 0,
     whatsappNumber: "+15550199",
     instagramUsername: "cakeflow_bakery",
     deliveryProvider: "Manual",
+    automationChannel: "WhatsApp",
+    perMessageCost: 0.01,
     fields: [
       { id: "flavor", name: "Select Flavor", type: "Dropdown", options: ["Chocolate Truffle", "Red Velvet", "Lemon Zest", "Vanilla Bean"], required: true },
       { id: "weight", name: "Select Weight", type: "Dropdown", options: ["0.5kg", "1kg", "2kg", "3kg"], required: true },
@@ -47,9 +51,13 @@ const initialBusinesses = {
     theme: "Dark",
     subscription: "Pro",
     isSubscribed: false,
+    messagesUsed: 620,
+    topUpMessages: 0,
     whatsappNumber: "+15559812",
     instagramUsername: "fastfoot_sneaks",
     deliveryProvider: "Shiprocket",
+    automationChannel: "Instagram",
+    perMessageCost: 0.008,
     fields: [
       { id: "size", name: "Select Size (US)", type: "Dropdown", options: ["7", "8", "9", "10", "11"], required: true },
       { id: "color", name: "Select Color", type: "Dropdown", options: ["Hyper Black", "Vanguard White", "Laser Red", "Cobalt Blue"], required: true },
@@ -78,9 +86,13 @@ const initialBusinesses = {
     theme: "Minimal",
     subscription: "Basic",
     isSubscribed: false,
+    messagesUsed: 120,
+    topUpMessages: 0,
     whatsappNumber: "+15554321",
     instagramUsername: "rosegold_atelier",
     deliveryProvider: "Delhivery",
+    automationChannel: "WhatsApp + Instagram",
+    perMessageCost: 0.015,
     fields: [
       { id: "metal", name: "Metal Polish", type: "Dropdown", options: ["18k Rose Gold", "24k Yellow Gold", "925 Sterling Silver"], required: true },
       { id: "engraving", name: "Custom Engraving Message", type: "Text", required: false, placeholder: "e.g. Forever & Always" },
@@ -108,9 +120,13 @@ const initialBusinesses = {
     theme: "Modern",
     subscription: "Pro",
     isSubscribed: false,
+    messagesUsed: 450,
+    topUpMessages: 0,
     whatsappNumber: "+15556789",
     instagramUsername: "clay_and_co",
     deliveryProvider: "Porter",
+    automationChannel: "WhatsApp",
+    perMessageCost: 0.01,
     fields: [
       { id: "notes", name: "Customization Notes", type: "Text", required: true, placeholder: "e.g. Paint an anime character" },
       { id: "inspiration", name: "Reference Image", type: "Upload", required: false },
@@ -138,9 +154,13 @@ const initialBusinesses = {
     theme: "Modern",
     subscription: "Premium",
     isSubscribed: false,
+    messagesUsed: 1250,
+    topUpMessages: 0,
     whatsappNumber: "+15551122",
     instagramUsername: "flex_customs",
     deliveryProvider: "Manual",
+    automationChannel: "WhatsApp + Instagram",
+    perMessageCost: 0.015,
     fields: [
       { id: "customText", name: "Your Text", type: "Text", required: true, placeholder: "Add your personalized text" },
       { id: "colorPicker", name: "Accent Color", type: "Dropdown", options: ["Red", "Gold", "Pink", "Mint Green"], required: true }
@@ -166,9 +186,13 @@ const initialBusinesses = {
     theme: "Minimal",
     subscription: "Pro",
     isSubscribed: false,
+    messagesUsed: 2200,
+    topUpMessages: 0,
     whatsappNumber: "+15555566",
     instagramUsername: "threads_co",
     deliveryProvider: "Delhivery",
+    automationChannel: "Instagram",
+    perMessageCost: 0.008,
     fields: [
       { id: "size", name: "Select Size", type: "Dropdown", options: ["XS", "S", "M", "L", "XL"], required: true },
       { id: "color", name: "Select Color", type: "Dropdown", options: ["Creamy Off-White", "Charcoal Black", "Soft Sage", "Vintage Indigo"], required: true },
@@ -189,6 +213,144 @@ const initialBusinesses = {
     ],
     templates: [
       { id: "t1", name: "Order Placed", body: "Hi {customer}, your order for {product} is confirmed! Fit: {fit}. Status: {status}." }
+    ]
+  },
+  "sweet-treats": {
+    id: "sweet-treats",
+    name: "Sweet Treats Bakery",
+    category: "Cake",
+    theme: "Modern",
+    subscription: "Basic",
+    isSubscribed: false,
+    messagesUsed: 45,
+    topUpMessages: 0,
+    whatsappNumber: "+15551234",
+    instagramUsername: "sweet_treats_bakery",
+    deliveryProvider: "Manual",
+    automationChannel: "Instagram",
+    perMessageCost: 0.008,
+    fields: [
+      { id: "flavor", name: "Select Flavor", type: "Dropdown", options: ["Chocolate", "Vanilla Buttercream", "Strawberry Swirl"], required: true },
+      { id: "weight", name: "Select Weight", type: "Dropdown", options: ["0.5kg", "1kg", "2kg"], required: true },
+      { id: "message", name: "Message on Cake", type: "Text", required: false, placeholder: "e.g. Happy Bday!" },
+      { id: "deliveryDate", name: "Delivery Date", type: "Date picker", required: true }
+    ],
+    products: [
+      { id: 1001, name: "Vanilla Buttercream Classic", price: "$32.00", rating: 4.8, image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=400&q=80", category: "Classics", desc: "Traditional vanilla sponge with smooth buttercream." },
+      { id: 1002, name: "Rainbow Sprinkles Joy", price: "$36.00", rating: 4.7, image: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=400&q=80", category: "Kids", desc: "Colorful sprinkles layered with vanilla custard." }
+    ],
+    orders: [
+      { id: "ST-1001", customer: "Jack Miller", date: "May 18, 2026", amount: "$32.00", status: "Baking", payment: "Paid", email: "jack@example.com", customFields: { flavor: "Vanilla Buttercream", weight: "1kg", message: "Sweet 16!" }, items: [{ name: "Vanilla Buttercream Classic", price: "$32.00", quantity: 1 }] }
+    ],
+    chats: [
+      { id: 1, sender: "customer", text: "Can you make it less sweet?", timestamp: "Yesterday" },
+      { id: 2, sender: "bot", text: "Sure! We can customize the sugar levels. I've noted this for your order.", timestamp: "Yesterday" }
+    ],
+    templates: [
+      { id: "t1", name: "Order Placed", body: "Hi {customer}, your sweet treats order {product} is verified! Status: {status}." }
+    ]
+  },
+  "cupcake-heaven": {
+    id: "cupcake-heaven",
+    name: "Cupcake Heaven",
+    category: "Cake",
+    theme: "Modern",
+    subscription: "Premium",
+    isSubscribed: false,
+    messagesUsed: 1850,
+    topUpMessages: 0,
+    whatsappNumber: "+15552345",
+    instagramUsername: "cupcake_heaven",
+    deliveryProvider: "Manual",
+    automationChannel: "WhatsApp + Instagram",
+    perMessageCost: 0.015,
+    fields: [
+      { id: "flavor", name: "Select Flavor", type: "Dropdown", options: ["Chocolate Fudge", "Salted Caramel", "Vanilla Dream"], required: true },
+      { id: "boxSize", name: "Box Size", type: "Dropdown", options: ["Box of 6", "Box of 12"], required: true },
+      { id: "deliveryDate", name: "Delivery Date", type: "Date picker", required: true }
+    ],
+    products: [
+      { id: 2001, name: "Fudge Chocolate Cupcakes", price: "$24.00", rating: 4.9, image: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&w=400&q=80", category: "Cupcakes", desc: "Rich double chocolate fudge toppings." },
+      { id: 2002, name: "Caramel Swirl Cupcakes", price: "$26.00", rating: 5.0, image: "https://images.unsplash.com/photo-1519340333755-5672c2393a83?auto=format&fit=crop&w=400&q=80", category: "Cupcakes", desc: "Salted caramel drizzle with cream core." }
+    ],
+    orders: [
+      { id: "CH-2001", customer: "Emma Watson", date: "May 20, 2026", amount: "$24.00", status: "Baking", payment: "Paid", email: "emma@example.com", customFields: { flavor: "Chocolate Fudge", boxSize: "Box of 6" }, items: [{ name: "Fudge Chocolate Cupcakes", price: "$24.00", quantity: 1 }] }
+    ],
+    chats: [
+      { id: 1, sender: "customer", text: "Do you deliver on Sundays?", timestamp: "9:00 AM" },
+      { id: 2, sender: "bot", text: "Yes! Cupcake Heaven delivers seven days a week between 8 AM and 8 PM.", timestamp: "9:02 AM" }
+    ],
+    templates: [
+      { id: "t1", name: "Order Placed", body: "Hi {customer}! Your box of {product} has been prepared. Status: {status}." }
+    ]
+  },
+  "frosting-fantasies": {
+    id: "frosting-fantasies",
+    name: "Frosting Fantasies",
+    category: "Cake",
+    theme: "Luxury",
+    subscription: "Free",
+    isSubscribed: false,
+    messagesUsed: 75,
+    topUpMessages: 0,
+    whatsappNumber: "+15553456",
+    instagramUsername: "frosting_fantasies",
+    deliveryProvider: "Manual",
+    automationChannel: "Instagram",
+    perMessageCost: 0.008,
+    fields: [
+      { id: "flavor", name: "Select Flavor", type: "Dropdown", options: ["Red Velvet", "Lemon Cream", "Rich Truffle"], required: true },
+      { id: "weight", name: "Select Weight", type: "Dropdown", options: ["1kg", "2kg", "3kg"], required: true },
+      { id: "message", name: "Message on Cake", type: "Text", required: false, placeholder: "e.g. HBD!" },
+      { id: "deliveryDate", name: "Delivery Date", type: "Date picker", required: true }
+    ],
+    products: [
+      { id: 3001, name: "Unicorn Fantasy Dream", price: "$65.00", rating: 5.0, image: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=400&q=80", category: "Custom", desc: "Magical multi-tier cake with hand-crafted horn decoration." },
+      { id: 3002, name: "Red Velvet Romance", price: "$48.00", rating: 4.8, image: "https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&w=400&q=80", category: "Romantic", desc: "Rich crimson layers with satin cream finish." }
+    ],
+    orders: [
+      { id: "FF-3001", customer: "Lily Rose", date: "May 19, 2026", amount: "$65.00", status: "Baking", payment: "Paid", email: "lily@example.com", customFields: { flavor: "Red Velvet", weight: "2kg", message: "HBD Lily!" }, items: [{ name: "Unicorn Fantasy Dream", price: "$65.00", quantity: 1 }] }
+    ],
+    chats: [
+      { id: 1, sender: "customer", text: "Can you add a custom topper?", timestamp: "11:00 AM" },
+      { id: 2, sender: "bot", text: "Yes! Unicorn toppers are available. Standard customized topper is $5 extra.", timestamp: "11:02 AM" }
+    ],
+    templates: [
+      { id: "t1", name: "Order Placed", body: "Dear {customer}, your luxury cake {product} is being sculpted. Status: {status}." }
+    ]
+  },
+  "sugar-rush": {
+    id: "sugar-rush",
+    name: "Sugar Rush Cakes",
+    category: "Cake",
+    theme: "Modern",
+    subscription: "Pro",
+    isSubscribed: false,
+    messagesUsed: 420,
+    topUpMessages: 0,
+    whatsappNumber: "+15554567",
+    instagramUsername: "sugar_rush_cakes",
+    deliveryProvider: "Manual",
+    automationChannel: "WhatsApp",
+    perMessageCost: 0.01,
+    fields: [
+      { id: "flavor", name: "Select Flavor", type: "Dropdown", options: ["Salted Caramel", "Carrot Walnut", "Double Chocolate"], required: true },
+      { id: "weight", name: "Select Weight", type: "Dropdown", options: ["0.5kg", "1kg", "2kg"], required: true },
+      { id: "deliveryDate", name: "Delivery Date", type: "Date picker", required: true }
+    ],
+    products: [
+      { id: 4001, name: "Salted Caramel Volcano", price: "$39.00", rating: 4.9, image: "https://images.unsplash.com/photo-1519340333755-5672c2393a83?auto=format&fit=crop&w=400&q=80", category: "Trending", desc: "Lava cake filled with piping hot caramel cream." },
+      { id: 4002, name: "Classic Carrot Walnut Cake", price: "$35.00", rating: 4.7, image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=400&q=80", category: "Classics", desc: "Spiced sponge loaded with roasted walnuts and carrots." }
+    ],
+    orders: [
+      { id: "SR-4001", customer: "David Brown", date: "May 20, 2026", amount: "$39.00", status: "Baking", payment: "Paid", email: "david@example.com", customFields: { flavor: "Salted Caramel", weight: "1kg" }, items: [{ name: "Salted Caramel Volcano", price: "$39.00", quantity: 1 }] }
+    ],
+    chats: [
+      { id: 1, sender: "customer", text: "Is it eggless?", timestamp: "Yesterday" },
+      { id: 2, sender: "bot", text: "Our Salted Caramel Volcano can be customized eggless! Select options at checkout.", timestamp: "Yesterday" }
+    ],
+    templates: [
+      { id: "t1", name: "Order Placed", body: "Hi {customer}, your delicious {product} is in the oven! Status: {status}." }
     ]
   }
 };
@@ -321,9 +483,13 @@ export const TenantProvider = ({ children }) => {
       theme: businessData.theme || "Modern",
       subscription: businessData.subscription || "Basic",
       isSubscribed: false, // Starts locked until subscribed
+      messagesUsed: 0,
+      topUpMessages: 0,
       whatsappNumber: businessData.whatsappNumber || "+15550000",
       instagramUsername: businessData.instagramUsername || newId,
       deliveryProvider: "Manual",
+      automationChannel: businessData.automationChannel || "WhatsApp",
+      perMessageCost: businessData.automationChannel === "Instagram" ? 0.008 : businessData.automationChannel === "WhatsApp + Instagram" ? 0.015 : 0.01,
       fields: defaultFields,
       products: defaultProducts,
       orders: defaultOrders,
@@ -461,10 +627,12 @@ export const TenantProvider = ({ children }) => {
         timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
         ...message
       };
+      const isBot = message.sender === 'bot';
       return {
         ...prev,
         [businessId]: {
           ...biz,
+          messagesUsed: (biz.messagesUsed || 0) + (isBot ? 1 : 0),
           chats: [...biz.chats, newMsg]
         }
       };
@@ -512,6 +680,20 @@ export const TenantProvider = ({ children }) => {
     addChatMessage(businessId, { sender: 'bot', text: `[AUTOMATED WHATSAPP SEND TO ${order.email || 'Customer'}]: "${formattedMsg}"` });
   };
 
+  const topUpMessageQuota = (businessId, amount) => {
+    setBusinesses(prev => {
+      const biz = prev[businessId];
+      if (!biz) return prev;
+      return {
+        ...prev,
+        [businessId]: {
+          ...biz,
+          topUpMessages: (biz.topUpMessages || 0) + amount
+        }
+      };
+    });
+  };
+
   return (
     <TenantContext.Provider value={{
       businesses,
@@ -527,9 +709,19 @@ export const TenantProvider = ({ children }) => {
       addOrder,
       updateOrderStatus,
       addChatMessage,
-      sendAutomatedMessage
+      sendAutomatedMessage,
+      topUpMessageQuota,
+      PLAN_LIMITS
     }}>
       {children}
     </TenantContext.Provider>
   );
+};
+
+export const PLAN_LIMITS = {
+  "Free": { orders: 15, messages: 100 },
+  "Basic": { orders: 100, messages: 1000 },
+  "Pro": { orders: 500, messages: 5000 },
+  "Premium": { orders: 2500, messages: 25000 },
+  "Enterprise": { orders: Infinity, messages: Infinity }
 };

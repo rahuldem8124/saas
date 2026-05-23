@@ -3,6 +3,7 @@ import { DollarSign, LayoutDashboard, ShoppingBag, Package, Users, BarChart2, Tr
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
+import AdminNavbar from '../components/AdminNavbar';
 
 const AdminPayments = () => {
   const { user, switchRole } = useAuth();
@@ -79,6 +80,7 @@ const AdminPayments = () => {
       </aside>
 
       <main style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
+        <AdminNavbar />
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
           <div>
             <h1 style={{ fontSize: '3rem', fontWeight: 800 }}>Payment Ledger</h1>

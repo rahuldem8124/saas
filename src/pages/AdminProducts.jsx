@@ -3,6 +3,7 @@ import { Package, LayoutDashboard, ShoppingBag, Users, DollarSign, BarChart2, Tr
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
+import AdminNavbar from '../components/AdminNavbar';
 
 const AdminProducts = () => {
   const { user } = useAuth();
@@ -107,6 +108,7 @@ const AdminProducts = () => {
       </aside>
 
       <main className="admin-main" style={{ marginLeft: '280px', flex: 1, padding: '40px 4rem 4rem' }}>
+        <AdminNavbar />
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
           <div>
             <h1 style={{ fontSize: '3rem', fontWeight: 900 }}>Product Catalog</h1>
