@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTenant } from '../context/TenantContext';
 
 const Footer = () => {
   const location = useLocation();
+  const { activeBusiness } = useTenant();
   const isStorefront = location.pathname.startsWith('/store');
   const isSaaSActive = 
     location.pathname === '/' ||
@@ -82,7 +84,72 @@ const Footer = () => {
     );
   }
 
-  // Original bakery store footer
+  // Dynamic business content for the storefront footer
+  const bizName = activeBusiness?.name || 'CakeFlow Flagship';
+  const bizCategory = activeBusiness?.category || 'Cake';
+  const bizColor = activeBusiness?.brandColor || 'var(--color-pink)';
+  const bizPhone = activeBusiness?.whatsappNumber || '+1 (555) 123-4567';
+  const bizEmail = activeBusiness?.instagramUsername ? `${activeBusiness.instagramUsername}@shopflow.io` : `${activeBusiness?.id || 'hello'}@shopflow.io`;
+  
+  let bizDesc = 'Handcrafting moments of joy since 2010. We use only the finest ingredients to create cakes that taste as good as they look.';
+  let link1Label = 'Birthday Cakes';
+  let link2Label = 'Wedding Collection';
+  let link3Label = 'Custom Orders';
+  
+  let link1Path = '/birthday';
+  let link2Path = '/wedding';
+  let link3Path = '/custom';
+  
+  let bizAddress = '123 Bakery Lane, New York';
+
+  if (bizCategory === 'Shoes') {
+    bizDesc = activeBusiness?.tagline || 'Unmatched streetwear, athletic sneakers, and classics engineered for premium style and absolute comfort.';
+    bizAddress = '456 Streetwear Plaza, Los Angeles';
+    link1Label = 'Runners';
+    link2Label = 'Classics';
+    link3Label = 'Athletic';
+    link1Path = '/birthday?category=Runners';
+    link2Path = '/wedding?category=Classics';
+    link3Path = '/custom?category=Athletic';
+  } else if (bizCategory === 'Accessories') {
+    bizDesc = activeBusiness?.tagline || 'Aesthetic minimalist accessories and premium hand-crafted pure jewelry metal bands.';
+    bizAddress = '789 Silver Blvd, Paris';
+    link1Label = 'Rings';
+    link2Label = 'Earrings';
+    link3Label = 'Necklaces';
+    link1Path = '/birthday?category=Rings';
+    link2Path = '/wedding?category=Earrings';
+    link3Path = '/custom?category=Necklaces';
+  } else if (bizCategory === 'Clothing' || bizCategory === 'Fashion') {
+    bizDesc = activeBusiness?.tagline || 'Aesthetic organic clothing & apparel designed for premium, sustainable everyday fashion.';
+    bizAddress = '321 Organic Way, Milan';
+    link1Label = 'Jackets';
+    link2Label = 'Essentials';
+    link3Label = 'Custom Sizing';
+    link1Path = '/birthday?category=Jackets';
+    link2Path = '/wedding?category=Essentials';
+    link3Path = '/custom?category=Custom';
+  } else if (bizCategory === 'Handmade') {
+    bizDesc = activeBusiness?.tagline || 'Artisanal pottery & custom crafts molded and glazed by hand for unique personal expressions.';
+    bizAddress = '654 Artisanal Way, Tokyo';
+    link1Label = 'Ceramics';
+    link2Label = 'Decor';
+    link3Label = 'Expedited Crafting';
+    link1Path = '/birthday?category=Ceramics';
+    link2Path = '/wedding?category=Decor';
+    link3Path = '/custom';
+  } else if (bizCategory !== 'Cake') {
+    bizDesc = activeBusiness?.tagline || activeBusiness?.customRequirements || 'Bespoke custom e-commerce products designed and personalized specifically to your requirements.';
+    bizAddress = '100 Pine Street, San Francisco';
+    link1Label = 'Latest Products';
+    link2Label = 'Best Sellers';
+    link3Label = 'Custom Inquiries';
+    link1Path = '/birthday';
+    link2Path = '/wedding';
+    link3Path = '/custom';
+  }
+
+  // Original storefront footer, dynamically adapting to multi-tenant business context
   return (
     <footer style={{ 
       background: 'var(--color-brown-dark)', 
@@ -100,20 +167,20 @@ const Footer = () => {
       }}>
         <div>
           <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', marginBottom: '1.5rem', fontWeight: 900, color: 'white' }}>
-            CakeFlow<span style={{ color: 'var(--color-pink)' }}>.</span>
+            {bizName}<span style={{ color: bizColor }}>.</span>
           </h2>
           <p style={{ opacity: 0.7, lineHeight: '1.8', marginBottom: '2rem', maxWidth: '350px' }}>
-            Handcrafting moments of joy since 2010. We use only the finest ingredients to create cakes that taste as good as they look.
+            {bizDesc}
           </p>
         </div>
 
         <div>
           <h3 style={{ fontSize: '1.3rem', marginBottom: '1.8rem', fontWeight: 800, color: 'white' }}>Quick Links</h3>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <li><Link to="/" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Home</Link></li>
-            <li><Link to="/birthday" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Birthday Cakes</Link></li>
-            <li><Link to="/wedding" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Wedding Collection</Link></li>
-            <li><Link to="/custom" style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Custom Orders</Link></li>
+            <li><Link to={`/store/${activeBusiness?.id || 'cakeflow'}`} style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>Home</Link></li>
+            <li><Link to={link1Path} style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>{link1Label}</Link></li>
+            <li><Link to={link2Path} style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>{link2Label}</Link></li>
+            <li><Link to={link3Path} style={{ color: 'white', textDecoration: 'none', opacity: 0.7, fontWeight: 600 }}>{link3Label}</Link></li>
           </ul>
         </div>
 
@@ -130,9 +197,9 @@ const Footer = () => {
         <div>
           <h3 style={{ fontSize: '1.3rem', marginBottom: '1.8rem', fontWeight: 800, color: 'white' }}>Contact Us</h3>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-            <li style={{ opacity: 0.7, fontWeight: 600 }}>123 Bakery Lane, New York</li>
-            <li style={{ opacity: 0.7, fontWeight: 600 }}>+1 (555) 123-4567</li>
-            <li style={{ opacity: 0.7, fontWeight: 600 }}>hello@cakeflow.com</li>
+            <li style={{ opacity: 0.7, fontWeight: 600 }}>{bizAddress}</li>
+            <li style={{ opacity: 0.7, fontWeight: 600 }}>{bizPhone}</li>
+            <li style={{ opacity: 0.7, fontWeight: 600 }}>{bizEmail}</li>
           </ul>
         </div>
       </div>
@@ -145,7 +212,7 @@ const Footer = () => {
         fontSize: '0.95rem',
         fontWeight: 600
       }}>
-        © 2026 CakeFlow. All rights reserved. Made with love for sweet moments.
+        © 2026 {bizName}. All rights reserved. Built with love for your storefront.
       </div>
     </footer>
   );
