@@ -8,9 +8,20 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const savedUser = localStorage.getItem('cake_user');
-      return savedUser ? JSON.parse(savedUser) : { role: 'admin', name: 'Flagship Seller', businessId: 'cakeflow' };
+      if (savedUser) {
+        const parsed = JSON.parse(savedUser);
+        // Force pristine start: If the user has the legacy default admin session, clear and reset it to customer!
+        if (parsed.role === 'admin' && parsed.name === 'Flagship Seller') {
+          localStorage.removeItem('cake_user');
+          localStorage.removeItem('saas_businesses');
+          localStorage.removeItem('active_business_id');
+          return { role: 'customer', name: 'Sarah Johnson' };
+        }
+        return parsed;
+      }
+      return { role: 'customer', name: 'Sarah Johnson' };
     } catch (e) {
-      return { role: 'admin', name: 'Flagship Seller', businessId: 'cakeflow' };
+      return { role: 'customer', name: 'Sarah Johnson' };
     }
   });
 
