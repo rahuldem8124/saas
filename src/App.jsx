@@ -31,6 +31,7 @@ import SaaSPage from './pages/SaaSPage';
 import TenantStorefront from './pages/TenantStorefront';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import CommunicationHub from './pages/CommunicationHub';
+import SimulatorHub from './pages/SimulatorHub';
 
 // Simple placeholder components for missing pages
 const ContactPage = () => <div style={{ padding: '120px 5%' }}><h1>Contact Us</h1><p>Email: hello@cakeflow.com</p></div>;
@@ -60,6 +61,7 @@ function App() {
     location.pathname.startsWith('/saas') || 
     location.pathname.startsWith('/super-admin') || 
     location.pathname.startsWith('/admin') || 
+    location.pathname.startsWith('/simulator') || 
     (isStorefront && !location.pathname.startsWith('/store/cakeflow-legacy'));
   
   const hasBothNavbars = isPlainCustomerRoute && !isSaaSActive;
@@ -92,6 +94,7 @@ function App() {
           <Route path="/saas" element={<Navigate to="/" replace />} />
           <Route path="/store/:businessId" element={<TenantStorefront />} />
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
+          <Route path="/simulator" element={<SimulatorHub />} />
 
           {/* Admin Routes protected with ProtectedRoute wrapper */}
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />

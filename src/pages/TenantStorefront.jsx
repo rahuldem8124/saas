@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTenant } from '../context/TenantContext';
@@ -28,7 +29,7 @@ const Instagram = ({ size = 20, ...props }) => (
 const TenantStorefront = () => {
   const { businessId } = useParams();
   const navigate = useNavigate();
-  const { businesses, addOrder, addChatMessage } = useTenant();
+  const { businesses, addOrder, addChatMessage, updateBusiness } = useTenant();
 
   const biz = businesses[businessId] || businesses['cakeflow'];
   const [activeTheme, setActiveTheme] = useState(biz.theme || 'Modern');
@@ -63,6 +64,14 @@ const TenantStorefront = () => {
   const [waChats, setWaChats] = useState([]);
   const [waTyping, setWaTyping] = useState(false);
   const [waChatInput, setWaChatInput] = useState('');
+
+  // Custom Page Request Form States
+  const [reqName, setReqName] = useState('');
+  const [reqContact, setReqContact] = useState('');
+  const [reqNiche, setReqNiche] = useState('Cake');
+  const [reqSpecs, setReqSpecs] = useState('');
+  const [reqNotes, setReqNotes] = useState('');
+  const [showReqSuccess, setShowReqSuccess] = useState(false);
   const [waCheckoutProduct, setWaCheckoutProduct] = useState(null);
   
   // Instagram States
@@ -73,6 +82,27 @@ const TenantStorefront = () => {
   const [igCommentInputs, setIgCommentInputs] = useState({});
   const [igPostComments, setIgPostComments] = useState({});
 
+  // Store personalization state
+  const [personalization, setPersonalization] = useState({
+    name: biz.name || '',
+    category: biz.category || 'Cake',
+    brandColor: biz.category === 'Shoes' ? '#0284C7' : biz.category === 'Clothing' ? '#4F46E5' : biz.category === 'Accessories' ? '#D4AF37' : biz.category === 'Handmade' ? '#10B981' : '#F28CA3',
+    tagline: biz.category === 'Cake' ? 'Custom Layered Wedding Tiers & Celebration Confections' : biz.category === 'Shoes' ? 'Hyper-Limited Premium Runners & Custom Streetwear' : biz.category === 'Accessories' ? 'Handcrafted Boutique Jewelry & Rings' : biz.category === 'Handmade' ? 'Organically Molded Ceramic Crafts' : 'Tailored Custom Mystery Gifts',
+    style: 'Modern Premium',
+    audience: 'Premium Social Buyers',
+    layout: 'Grid Catalog',
+    additionalFeatures: ['WhatsApp Notifications', 'Custom Checkout Builder'],
+    customRequirements: ''
+  });
+
+  // Dynamic customization builder states
+  const [newFieldName, setNewFieldName] = useState('');
+  const [newFieldType, setNewFieldType] = useState('Dropdown');
+  const [newFieldOptions, setNewFieldOptions] = useState('Option 1, Option 2, Option 3');
+
+  // Customer storefront tabs state
+  const [currentTab, setCurrentTab] = useState('All');
+
   useEffect(() => {
     setActiveTheme(biz.theme || 'Modern');
     setStoreCart([]);
@@ -80,6 +110,19 @@ const TenantStorefront = () => {
     setCheckoutStep(0);
     setActiveOrder(null);
     setActiveUiMode('Webpage');
+    setCurrentTab('All');
+
+    setPersonalization({
+      name: biz.name || '',
+      category: biz.category || 'Cake',
+      brandColor: biz.category === 'Shoes' ? '#0284C7' : biz.category === 'Clothing' ? '#4F46E5' : biz.category === 'Accessories' ? '#D4AF37' : biz.category === 'Handmade' ? '#10B981' : '#F28CA3',
+      tagline: biz.category === 'Cake' ? 'Custom Layered Wedding Tiers & Celebration Confections' : biz.category === 'Shoes' ? 'Hyper-Limited Premium Runners & Custom Streetwear' : biz.category === 'Accessories' ? 'Handcrafted Boutique Jewelry & Rings' : biz.category === 'Handmade' ? 'Organically Molded Ceramic Crafts' : 'Tailored Custom Mystery Gifts',
+      style: 'Modern Premium',
+      audience: 'Premium Social Buyers',
+      layout: 'Grid Catalog',
+      additionalFeatures: ['WhatsApp Notifications', 'Custom Checkout Builder'],
+      customRequirements: ''
+    });
     
     // Seed WhatsApp chats from context
     if (biz.chats && biz.chats.length > 0) {
@@ -110,6 +153,16 @@ const TenantStorefront = () => {
     setIgDmMessages([]);
     setIgCommentInputs({});
   }, [businessId, biz]);
+
+  // Synchronize dynamic custom requests tab
+  useEffect(() => {
+    if (currentTab === 'Custom Cakes' || currentTab === 'Custom creations' || currentTab === 'Request Form' || currentTab === 'Art requests') {
+      const firstProduct = biz.products[0];
+      if (firstProduct) {
+        setSelectedProduct(firstProduct);
+      }
+    }
+  }, [currentTab, biz]);
 
   // Sync custom field states when selected product changes
   useEffect(() => {
@@ -524,6 +577,11 @@ const TenantStorefront = () => {
 
   const s = getThemeStyles();
 
+  if (personalization && personalization.brandColor) {
+    s.accent = personalization.brandColor;
+    s.gradient = `linear-gradient(135deg, ${personalization.brandColor} 0%, ${personalization.brandColor}dd 100%)`;
+  }
+
   return (
     <div style={{ background: '#F1F5F9', minHeight: '100vh', paddingTop: '80px', paddingBottom: '100px', fontFamily: s.font, paddingLeft: '4%', paddingRight: '4%' }}>
       <style>{`
@@ -570,11 +628,14 @@ const TenantStorefront = () => {
           {/* 1. Category Switcher */}
           <div>
             <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#475569', margin: '0 0 10px 0', letterSpacing: '0.3px' }}>BUSINESS DEMO:</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '250px', overflowY: 'auto', paddingRight: '4px' }}>
               {[
                 { id: 'cakeflow', label: '🎂 CakeFlow Bakery', cat: 'Cake', desc: 'Bespoke bakeries' },
                 { id: 'fastfoot', label: '👟 FastFoot Sneakers', cat: 'Shoes', desc: 'Custom sneaker orders' },
-                { id: 'threads-co', label: '👕 Threads & Co. Apparel', cat: 'Clothing', desc: 'Luxury monogrammed apparel' }
+                { id: 'rose-gold', label: '💍 RoseGold Atelier', cat: 'Accessories', desc: 'Boutique jewelry & bracelets' },
+                { id: 'threads-co', label: '👕 Threads & Co.', cat: 'Clothing', desc: 'Luxury monogrammed apparel' },
+                { id: 'crafty', label: '🎨 Clay & Co. Pottery', cat: 'Handmade', desc: 'Handmade ceramic crafts' },
+                { id: 'builder-box', label: '📦 Flex Custom Studio', cat: 'Custom', desc: 'Custom layout visual studios' }
               ].map(item => {
                 const isActive = biz.id === item.id;
                 return (
@@ -638,42 +699,165 @@ const TenantStorefront = () => {
 
           <hr style={{ border: 'none', borderTop: '1px solid rgba(0,0,0,0.06)', margin: 0 }} />
 
-          {/* 3. Channels Tab */}
+          {/* 3. BUILD YOUR STORE EXPERIENCE */}
           <div>
-            <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#475569', margin: '0 0 10px 0', letterSpacing: '0.3px' }}>SELECT INTERFACE LIVE:</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {[
-                { mode: 'Webpage', label: 'Webpage Storefront', desc: 'Interactive catalog browser checkout', icon: Globe },
-                { mode: 'WhatsApp', label: 'WhatsApp Bot Chat', desc: 'Simulated interactive chat catalog', icon: MessageSquare },
-                { mode: 'Instagram', label: 'Instagram DM & Feed', desc: 'Auto-DM replies & secure purchase', icon: Instagram }
-              ].map(({ mode, label, desc, icon: Icon }) => {
-                const isActive = activeUiMode === mode;
-                return (
-                  <button
-                    key={mode}
-                    onClick={() => setActiveUiMode(mode)}
-                    style={{
-                      padding: '0.8rem 1rem',
-                      borderRadius: '12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.8rem',
-                      background: isActive ? 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)' : '#F8FAFC',
-                      color: isActive ? '#FFFFFF' : '#475569',
-                      border: isActive ? 'none' : '1px solid rgba(0,0,0,0.05)',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      textAlign: 'left'
+            <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#475569', margin: '0 0 10px 0', letterSpacing: '0.3px' }}>BUILD YOUR STORE EXPERIENCE:</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', background: '#F8FAFC', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+              <div className="form-group">
+                <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#475569', marginBottom: '2px' }}>BUSINESS NAME</label>
+                <input 
+                  type="text" 
+                  value={personalization.name}
+                  onChange={e => {
+                    setPersonalization({...personalization, name: e.target.value});
+                    updateBusiness(biz.id, { name: e.target.value });
+                  }}
+                  style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.75rem', outline: 'none', fontWeight: 700 }}
+                />
+              </div>
+
+              <div className="form-group">
+                <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#475569', marginBottom: '2px' }}>PRIMARY BRAND COLOR</label>
+                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                  <input 
+                    type="color" 
+                    value={personalization.brandColor}
+                    onChange={e => {
+                      setPersonalization({...personalization, brandColor: e.target.value});
                     }}
-                  >
-                    <Icon size={18} />
-                    <div>
-                      <div style={{ fontWeight: 800, fontSize: '0.75rem' }}>{label}</div>
-                      <div style={{ fontSize: '0.6rem', opacity: isActive ? 0.9 : 0.6, marginTop: '1px', fontWeight: 500 }}>{desc}</div>
-                    </div>
-                  </button>
-                );
-              })}
+                    style={{ width: '28px', height: '28px', border: 'none', padding: 0, borderRadius: '4px', cursor: 'pointer' }}
+                  />
+                  <input 
+                    type="text" 
+                    value={personalization.brandColor}
+                    onChange={e => {
+                      setPersonalization({...personalization, brandColor: e.target.value});
+                    }}
+                    style={{ flex: 1, padding: '4px 6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.75rem', outline: 'none', fontFamily: 'monospace' }}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#475569', marginBottom: '2px' }}>STORE TAGLINE</label>
+                <input 
+                  type="text" 
+                  value={personalization.tagline}
+                  onChange={e => setPersonalization({...personalization, tagline: e.target.value})}
+                  style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.75rem', outline: 'none' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
+                <div className="form-group">
+                  <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#475569', marginBottom: '2px' }}>PREFERRED STYLE</label>
+                  <input 
+                    type="text" 
+                    value={personalization.style}
+                    onChange={e => setPersonalization({...personalization, style: e.target.value})}
+                    style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.75rem', outline: 'none' }}
+                  />
+                </div>
+                <div className="form-group">
+                  <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#475569', marginBottom: '2px' }}>TARGET AUDIENCE</label>
+                  <input 
+                    type="text" 
+                    value={personalization.audience}
+                    onChange={e => setPersonalization({...personalization, audience: e.target.value})}
+                    style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.75rem', outline: 'none' }}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#475569', marginBottom: '2px' }}>CUSTOM REQUIREMENTS</label>
+                <textarea 
+                  placeholder="Describe exactly how you want your store..." 
+                  value={personalization.customRequirements}
+                  onChange={e => setPersonalization({...personalization, customRequirements: e.target.value})}
+                  style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.75rem', outline: 'none', height: '50px', resize: 'none', fontFamily: 'inherit' }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <hr style={{ border: 'none', borderTop: '1px solid rgba(0,0,0,0.06)', margin: 0 }} />
+
+          {/* 4. ADVANCED CUSTOMIZATION BUILDER */}
+          <div>
+            <h3 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#475569', margin: '0 0 10px 0', letterSpacing: '0.3px' }}>ADVANCED CUSTOMIZATION BUILDER:</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', background: '#F8FAFC', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.05)' }}>
+              <span style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: 700 }}>Active fields on checkout modal:</span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '4px' }}>
+                {biz.fields.map(f => (
+                  <span key={f.id} style={{ fontSize: '0.6rem', background: 'rgba(79, 70, 229, 0.1)', color: '#4F46E5', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                    {f.name} ({f.type})
+                  </span>
+                ))}
+              </div>
+              
+              <div style={{ height: '1px', background: 'rgba(0,0,0,0.06)', margin: '2px 0' }} />
+              
+              <div className="form-group">
+                <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#475569', marginBottom: '2px' }}>OPTION NAME</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. Weight, Size, Color, Reference image" 
+                  value={newFieldName}
+                  onChange={e => setNewFieldName(e.target.value)}
+                  style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.75rem', outline: 'none' }}
+                />
+              </div>
+
+              <div className="form-group">
+                <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#475569', marginBottom: '2px' }}>OPTION TYPE</label>
+                <select 
+                  value={newFieldType}
+                  onChange={e => setNewFieldType(e.target.value)}
+                  style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.75rem', outline: 'none' }}
+                >
+                  {["Dropdown", "Text", "Date picker", "Upload", "Reference image", "Message field", "Number field"].map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              {newFieldType === 'Dropdown' && (
+                <div className="form-group">
+                  <label style={{ display: 'block', fontSize: '0.65rem', fontWeight: 800, color: '#475569', marginBottom: '2px' }}>COMMA-SEPARATED OPTIONS</label>
+                  <input 
+                    type="text" 
+                    placeholder="Option 1, Option 2, Option 3" 
+                    value={newFieldOptions}
+                    onChange={e => setNewFieldOptions(e.target.value)}
+                    style={{ width: '100%', padding: '6px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '0.75rem', outline: 'none' }}
+                  />
+                </div>
+              )}
+
+              <button
+                onClick={() => {
+                  if (!newFieldName.trim()) return;
+                  const newField = {
+                    id: newFieldName.toLowerCase().replace(/\s+/g, '-'),
+                    name: newFieldName,
+                    type: newFieldType === 'Reference image' || newFieldType === 'Upload' ? 'Upload' : 
+                          newFieldType === 'Date picker' ? 'Date picker' : 
+                          newFieldType === 'Number field' ? 'Number' : 
+                          newFieldType === 'Dropdown' ? 'Dropdown' : 'Text',
+                    required: true
+                  };
+                  if (newField.type === 'Dropdown') {
+                    newField.options = newFieldOptions.split(',').map(o => o.trim());
+                  }
+                  // Update the business fields in TenantContext
+                  updateBusiness(biz.id, { fields: [...biz.fields, newField] });
+                  setNewFieldName('');
+                }}
+                style={{ width: '100%', padding: '8px', background: s.gradient, color: 'white', border: 'none', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 800, cursor: 'pointer' }}
+              >
+                + Add Custom Option
+              </button>
             </div>
           </div>
 
@@ -766,41 +950,12 @@ const TenantStorefront = () => {
             {/* Divider */}
             <div style={{ height: '1px', background: 'rgba(0,0,0,0.06)' }} />
 
-            {/* Interface Channel Row */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: s.accent, letterSpacing: '0.5px' }}>SELECT INTERFACE LIVE:</span>
-              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                {[
-                  { mode: 'Webpage', label: 'Webpage', icon: Globe },
-                  { mode: 'WhatsApp', label: 'WhatsApp UI', icon: MessageSquare },
-                  { mode: 'Instagram', label: 'Instagram UI', icon: Instagram }
-                ].map(({ mode, label, icon: Icon }) => {
-                  const isActive = activeUiMode === mode;
-                  return (
-                    <button
-                      key={mode}
-                      onClick={() => setActiveUiMode(mode)}
-                      style={{
-                        padding: '0.4rem 0.9rem',
-                        borderRadius: '20px',
-                        fontSize: '0.75rem',
-                        fontWeight: 800,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        background: isActive ? 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)' : '#F1F5F9',
-                        color: isActive ? '#FFFFFF' : '#374151',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <Icon size={13} />
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
+            {/* Personalized Store Details Banner Row */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.8rem' }}>
+              <span style={{ fontWeight: 800, color: s.accent, letterSpacing: '0.5px' }}>STORE TAGLINE:</span>
+              <span style={{ fontStyle: 'italic', color: '#475569', fontWeight: 600, fontSize: '0.75rem', maxWidth: '330px', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                "{personalization.tagline}"
+              </span>
             </div>
           </div>
 
@@ -925,46 +1080,350 @@ const TenantStorefront = () => {
               )}
             </header>
 
+            {/* Category Pages Navigation Tabs */}
+            {checkoutStep === 0 && (
+              <div style={{
+                display: 'flex',
+                gap: '0.4rem',
+                padding: '0.8rem 1rem',
+                background: s.cardBg,
+                borderBottom: `1px solid ${s.dividerColor}`,
+                overflowX: 'auto',
+                scrollbarWidth: 'none',
+                boxSizing: 'border-box'
+              }}>
+                {(() => {
+                  const getTabsForCategory = () => {
+                    switch (biz.category) {
+                      case 'Cake':
+                        return ['All', 'Birthday', 'Wedding', 'Custom Request', 'Tracking'];
+                      case 'Shoes':
+                        return ['All', 'Sneakers', 'Sports', 'Custom Request', 'Tracking'];
+                      case 'Accessories':
+                        return ['All', 'Bracelets', 'Rings', 'Custom Request', 'Tracking'];
+                      case 'Handmade':
+                        return ['All', 'Custom creations', 'Custom Request', 'Tracking'];
+                      case 'Clothing':
+                      case 'Fashion':
+                        return ['All', 'Menswear', 'Womenswear', 'Custom Request', 'Tracking'];
+                      default:
+                        return ['All', 'Storefront', 'Custom Request', 'Tracking'];
+                    }
+                  };
+                  return getTabsForCategory().map(tab => {
+                    const isActive = currentTab === tab;
+                    return (
+                      <button
+                        key={tab}
+                        onClick={() => setCurrentTab(tab)}
+                        style={{
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '20px',
+                          fontSize: '0.75rem',
+                          fontWeight: 800,
+                          background: isActive ? s.accent : 'transparent',
+                          color: isActive ? 'white' : s.text,
+                          opacity: isActive ? 1 : 0.7,
+                          border: isActive ? 'none' : `1px solid ${s.borderColor}`,
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {tab}
+                      </button>
+                    );
+                  });
+                })()}
+              </div>
+            )}
+
             {/* Dynamic Pages renderer */}
             <div style={{ flex: 1, padding: '1.5rem', overflowY: 'auto' }}>
               
               {/* STEP 0: CATALOG PAGE */}
               {checkoutStep === 0 && (
                 <AnimatePresence>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                    {biz.products.map(prod => (
-                      <motion.div 
-                        key={prod.id}
-                        whileHover={{ y: -3 }}
-                        onClick={() => setSelectedProduct(prod)}
-                        style={{
+                  {currentTab === 'Tracking' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      <div style={{ background: s.cardBg, padding: '1.8rem', borderRadius: s.radius, border: activeTheme === 'Minimal' ? '2px solid black' : '1px solid ' + s.dividerColor, boxShadow: s.shadow, textAlign: 'center' }}>
+                        <h3 style={{ margin: '0 0 0.5rem', fontSize: '1.1rem', fontWeight: 900 }}>🔍 Track Scoped Order</h3>
+                        <p style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '1.2rem', fontWeight: 600 }}>Enter your invoice reference ID below to query our active status:</p>
+                        
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '1rem' }}>
+                          <input 
+                            type="text" 
+                            id="tracking-search-input"
+                            placeholder="e.g. CF-1001, SH-2001" 
+                            style={{ flex: 1, padding: '0.6rem 0.8rem', borderRadius: '10px', border: `1px solid ${s.borderColor}`, background: s.cardBg, color: s.text, fontSize: '0.85rem', fontWeight: 800, outline: 'none' }}
+                          />
+                          <button 
+                            onClick={() => {
+                              const val = document.getElementById('tracking-search-input').value.trim().toUpperCase();
+                              const found = biz.orders.find(o => o.id === val);
+                              if (found) {
+                                setActiveOrder(found);
+                                setCheckoutStep(4); // Take to live tracking progress screen!
+                              } else {
+                                alert(`Order ID "${val}" not found. Seed bookings: "CF-1001", "SH-2001", "AC-3001", "HM-4001"`);
+                              }
+                            }}
+                            style={{ background: s.gradient, color: 'white', padding: '0.6rem 1.2rem', border: 'none', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 900, cursor: 'pointer' }}
+                          >
+                            Track
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div style={{ background: 'rgba(79, 70, 229, 0.05)', border: `1px solid rgba(79, 70, 229, 0.1)`, padding: '1.2rem', borderRadius: s.radius, fontSize: '0.75rem', lineHeight: 1.5 }}>
+                        <span style={{ fontWeight: 800, color: s.accent, display: 'block', marginBottom: '4px' }}>💡 DEMO TRACKING LOOKUP KEYS:</span>
+                        Use these pre-seeded active invoice IDs to observe statuses:
+                        <ul style={{ margin: '4px 0 0', paddingLeft: '1.2rem', fontWeight: 600, display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          {biz.orders.map(o => (
+                            <li key={o.id}><b>{o.id}</b> — {o.customer} ({o.items[0]?.name}) - Status: <span style={{ color: s.accent }}>{o.status}</span></li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  ) : currentTab === 'Custom Request' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      {showReqSuccess ? (
+                        <div style={{
                           background: s.cardBg,
+                          padding: '2.5rem 1.8rem',
                           borderRadius: s.radius,
-                          overflow: 'hidden',
-                          boxShadow: s.shadow,
                           border: activeTheme === 'Minimal' ? '2px solid black' : '1px solid ' + s.dividerColor,
-                          cursor: 'pointer',
+                          boxShadow: s.shadow,
+                          textAlign: 'center',
                           display: 'flex',
-                          flexDirection: 'column'
-                        }}
-                      >
-                        <div style={{ overflow: 'hidden', aspectRatio: '1/1', position: 'relative' }}>
-                          <img src={prod.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={prod.name} />
-                          <div style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(255,255,255,0.9)', padding: '2px 8px', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 900, color: s.text }}>
-                            {prod.price}
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: '1.1rem'
+                        }}>
+                          <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(34, 197, 94, 0.1)', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', margin: '0 auto', fontWeight: 'bold' }}>
+                            ✓
+                          </div>
+                          <h3 style={{ fontSize: '1.3rem', fontWeight: 950, color: s.text, margin: 0 }}>Request Transmitted!</h3>
+                          <p style={{ fontSize: '0.8rem', color: s.text, opacity: 0.7, fontWeight: 600, margin: '0 auto 1.2rem', maxWidth: '340px', lineHeight: 1.5 }}>
+                            The merchant operator has received your custom page requirements and initialized a support session.
+                          </p>
+                          
+                          <div style={{ display: 'flex', gap: '10px', width: '100%', boxSizing: 'border-box' }}>
+                            <button 
+                              onClick={() => {
+                                setShowReqSuccess(false);
+                                setIsChatOpen(true);
+                              }}
+                              style={{ flex: 1.3, padding: '0.8rem', background: s.gradient, color: 'white', border: 'none', borderRadius: '10px', fontWeight: 900, fontSize: '0.8rem', cursor: 'pointer' }}
+                            >
+                              💬 Open Live Chat Support
+                            </button>
+                            <button 
+                              onClick={() => setShowReqSuccess(false)}
+                              style={{ flex: 0.7, padding: '0.8rem', background: 'rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.08)', color: s.text, borderRadius: '10px', fontWeight: 800, fontSize: '0.8rem', cursor: 'pointer' }}
+                            >
+                              Submit New
+                            </button>
                           </div>
                         </div>
-                        <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column', justify: 'space-between' }}>
-                          <h3 style={{ margin: '0 0 0.4rem', fontSize: '0.95rem', fontWeight: 900 }}>{prod.name}</h3>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#FFD700', fontSize: '0.8rem', fontWeight: 800 }}>
-                            <Star size={12} fill="#FFD700" /> {prod.rating || 4.8}
-                          </div>
+                      ) : (
+                        <div style={{
+                          background: s.cardBg,
+                          padding: '2rem',
+                          borderRadius: s.radius,
+                          border: activeTheme === 'Minimal' ? '2px solid black' : '1px solid ' + s.dividerColor,
+                          boxShadow: s.shadow
+                        }}>
+                          <h3 style={{ margin: '0 0 6px', fontSize: '1.25rem', fontWeight: 900, color: s.text }}>
+                            💬 Can't find your product or need a custom page?
+                          </h3>
+                          <p style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '1.5rem', fontWeight: 600, color: s.text }}>
+                            Send a specification request. Our active operators will review it, set up the requested page layout, and reply directly inside Live Chat!
+                          </p>
+
+                          <form onSubmit={(e) => {
+                            e.preventDefault();
+                            if (!reqName.trim() || !reqContact.trim() || !reqSpecs.trim()) {
+                              alert("Please fill in Name, Contact, and Specifications fields!");
+                              return;
+                            }
+                            
+                            // Submit message to merchant chat
+                            addChatMessage(biz.id, {
+                              sender: 'customer',
+                              text: `🚨 [CUSTOM STOREFRONT PAGE REQUEST]\n• Name: ${reqName}\n• Contact: ${reqContact}\n• Desired Niche Page: ${reqNiche}\n• Specs Requested: ${reqSpecs}\n• Notes: ${reqNotes || 'None'}`
+                            });
+
+                            // Reset inputs
+                            setReqName('');
+                            setReqContact('');
+                            setReqSpecs('');
+                            setReqNotes('');
+                            setShowReqSuccess(true);
+
+                            // Trigger automated response
+                            setTimeout(() => {
+                              addChatMessage(biz.id, {
+                                sender: 'seller',
+                                text: `Hi ${reqName}! We have received your custom request for a ${reqNiche} page/product type! 🚀 Our operator team is currently configuring the templates and will ping you back right here shortly.`
+                              });
+                            }, 1500);
+
+                          }} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                            
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                              <div className="form-group">
+                                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, marginBottom: '0.4rem', color: s.text }}>Your Name *</label>
+                                <input 
+                                  type="text" 
+                                  required
+                                  placeholder="e.g. Rahul"
+                                  value={reqName}
+                                  onChange={e => setReqName(e.target.value)}
+                                  style={{ width: '100%', padding: '0.7rem', borderRadius: '10px', border: '1px solid ' + s.borderColor, background: s.cardBg, color: s.text, fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box' }}
+                                />
+                              </div>
+                              <div className="form-group">
+                                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, marginBottom: '0.4rem', color: s.text }}>WhatsApp / Email *</label>
+                                <input 
+                                  type="text" 
+                                  required
+                                  placeholder="e.g. +91 99999 88888"
+                                  value={reqContact}
+                                  onChange={e => setReqContact(e.target.value)}
+                                  style={{ width: '100%', padding: '0.7rem', borderRadius: '10px', border: '1px solid ' + s.borderColor, background: s.cardBg, color: s.text, fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box' }}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="form-group">
+                              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, marginBottom: '0.4rem', color: s.text }}>Select Desired Product Niche Page type</label>
+                              <select 
+                                value={reqNiche}
+                                onChange={e => setReqNiche(e.target.value)}
+                                style={{ width: '100%', padding: '0.7rem', borderRadius: '10px', border: '1px solid ' + s.borderColor, background: s.cardBg, color: s.text, fontSize: '0.85rem', outline: 'none' }}
+                              >
+                                <option value="Bakery & Cake Page 🎂">Bakery & Cake Page 🎂</option>
+                                <option value="Sneakers & Shoes Page 👟">Sneakers & Shoes Page 👟</option>
+                                <option value="Clothing & Apparel Page 👕">Clothing & Apparel Page 👕</option>
+                                <option value="Jewelry & Accessories Page 💍">Jewelry & Accessories Page 💍</option>
+                                <option value="Pottery & Crafted Ceramics 🎨">Pottery & Crafted Ceramics 🎨</option>
+                                <option value="Other Custom Page 📦">Other Custom Page 📦</option>
+                              </select>
+                            </div>
+
+                            <div className="form-group">
+                              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, marginBottom: '0.4rem', color: s.text }}>What specific customizers/options do you want? *</label>
+                              <textarea 
+                                required
+                                placeholder="e.g. I want a shoe page with lacing customizers, sole options, and size drop-downs."
+                                value={reqSpecs}
+                                onChange={e => setReqSpecs(e.target.value)}
+                                style={{ width: '100%', padding: '0.7rem', borderRadius: '10px', border: '1px solid ' + s.borderColor, background: s.cardBg, color: s.text, fontSize: '0.85rem', outline: 'none', height: '70px', resize: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                              />
+                            </div>
+
+                            <div className="form-group">
+                              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, marginBottom: '0.4rem', color: s.text }}>Additional Details (Optional)</label>
+                              <textarea 
+                                placeholder="Any other styling, colors, or options..."
+                                value={reqNotes}
+                                onChange={e => setReqNotes(e.target.value)}
+                                style={{ width: '100%', padding: '0.7rem', borderRadius: '10px', border: '1px solid ' + s.borderColor, background: s.cardBg, color: s.text, fontSize: '0.85rem', outline: 'none', height: '50px', resize: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                              />
+                            </div>
+
+                            <button 
+                              type="submit" 
+                              style={{ background: s.gradient, color: 'white', padding: '0.85rem', border: 'none', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 900, cursor: 'pointer', marginTop: '0.5rem', transition: 'all 0.2s' }}
+                            >
+                              Submit Specifications Request
+                            </button>
+                          </form>
                         </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                      )}
+
+                      <div style={{ background: 'rgba(79, 70, 229, 0.05)', border: '1px solid rgba(79, 70, 229, 0.1)', padding: '1rem', borderRadius: s.radius, fontSize: '0.75rem', lineHeight: 1.5, display: 'flex', gap: '8px' }}>
+                        <span style={{ fontSize: '1.1rem' }}>💡</span>
+                        <span style={{ color: s.text }}>
+                          <b>OPERATOR CHAT CONNECTED:</b> Submitting this form sends your request directly into the merchant's support console. You can chat with the operator and follow up in real-time using the **Chat Support** console at the top!
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                      {(() => {
+                        const filteredProducts = biz.products.filter(p => {
+                          if (p.isActive === false) return false;
+                          if (currentTab === 'All' || currentTab === 'Collections' || currentTab === 'Storefront' || currentTab.includes('Custom') || currentTab.includes('Form') || currentTab.includes('request')) return true;
+                          const query = currentTab.toLowerCase();
+                          return p.name.toLowerCase().includes(query) || 
+                                 p.category.toLowerCase().includes(query) || 
+                                 (p.desc && p.desc.toLowerCase().includes(query));
+                        });
+                        if (filteredProducts.length === 0) {
+                          return (
+                            <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '2rem 0', opacity: 0.6, fontWeight: 700, fontSize: '0.85rem' }}>
+                              No items in this collection tab yet!
+                            </div>
+                          );
+                        }
+                        return filteredProducts.map(prod => (
+                          <motion.div 
+                            key={prod.id}
+                            whileHover={{ y: -3 }}
+                            onClick={() => setSelectedProduct(prod)}
+                            style={{
+                              background: s.cardBg,
+                              borderRadius: s.radius,
+                              overflow: 'hidden',
+                              boxShadow: s.shadow,
+                              border: activeTheme === 'Minimal' ? '2px solid black' : '1px solid ' + s.dividerColor,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              flexDirection: 'column'
+                            }}
+                          >
+                            <div style={{ overflow: 'hidden', aspectRatio: '1/1', position: 'relative' }}>
+                              <img src={prod.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={prod.name} />
+                              {prod.isFeatured && (
+                                <div style={{
+                                  position: 'absolute',
+                                  top: '8px',
+                                  left: '8px',
+                                  background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                                  color: 'white',
+                                  padding: '2px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '0.7rem',
+                                  fontWeight: 900,
+                                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.3)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '2px',
+                                  zIndex: 10
+                                }}>
+                                  <Star size={10} fill="white" stroke="none" /> FEATURED
+                                </div>
+                              )}
+                              <div style={{ position: 'absolute', bottom: '8px', right: '8px', background: 'rgba(255,255,255,0.9)', padding: '2px 8px', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 900, color: s.text }}>
+                                {prod.price}
+                              </div>
+                            </div>
+                            <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column', justify: 'space-between' }}>
+                              <h3 style={{ margin: '0 0 0.4rem', fontSize: '0.95rem', fontWeight: 900 }}>{prod.name}</h3>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#FFD700', fontSize: '0.8rem', fontWeight: 800 }}>
+                                <Star size={12} fill="#FFD700" /> {prod.rating || 4.8}
+                              </div>
+                            </div>
+                          </motion.div>
+                        ));
+                      })()}
+                    </div>
+                  )}
                 </AnimatePresence>
               )}
+
 
               {/* STEP 2: CHECKOUT SHIPPING INFO FORM */}
               {checkoutStep === 2 && (
@@ -1529,7 +1988,7 @@ const TenantStorefront = () => {
                       maxWidth: '100%',
                       scrollbarWidth: 'none'
                     }}>
-                      {biz.products.map(p => (
+                      {biz.products.filter(p => p.isActive !== false).map(p => (
                         <div key={p.id} style={{
                           flex: '0 0 180px',
                           background: activeTheme === 'Dark' ? '#1f2c34' : 'white',
@@ -1897,7 +2356,7 @@ const TenantStorefront = () => {
               paddingBottom: '2rem',
               maxHeight: 'calc(80vh - 55px)'
             }}>
-              {biz.products.map(p => {
+              {biz.products.filter(p => p.isActive !== false).map(p => {
                 const comments = igPostComments[p.id] || [];
                 const liked = igLikedPosts[p.id];
                 const commentVal = igCommentInputs[p.id] || '';

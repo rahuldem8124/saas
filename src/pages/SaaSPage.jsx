@@ -7,7 +7,7 @@ import {
   Sparkles, MessageCircle, BarChart2, ArrowRight, Check, Rocket, Layers, 
   Palette, Shield, Globe, ShoppingCart, User, AlertCircle, Terminal, 
   Send, RefreshCw, Smartphone, TrendingUp, Users, Cpu, FileText, Truck,
-  Settings, Zap, CheckCircle2, ChevronRight, Lock, MessageSquare
+  Settings, Zap, CheckCircle2, ChevronRight, Lock, MessageSquare, X
 } from 'lucide-react';
 
 const Instagram = ({ size = 20, ...props }) => (
@@ -96,6 +96,10 @@ const SaaSPage = () => {
     { id: 2, text: "👟 SoleVault updated stock for Nike Air Jordan Retro 1 (Size 10)", time: "2m ago", type: "stock" },
     { id: 3, text: "💍 DaintyGold enabled automated custom field 'Engraving Text'", time: "4m ago", type: "feature" }
   ]);
+
+  const dismissActivity = (id) => {
+    setLiveActivities(prev => prev.filter(act => act.id !== id));
+  };
 
   useEffect(() => {
     const templates = [
@@ -290,7 +294,7 @@ const SaaSPage = () => {
           mutedText: '#8E8E8E',
           dividerColor: '#DBDBDB'
         };
-      default: // Modern
+      default: { // Modern
         let modernBg = '#FFF8F3'; // default cake cream
         let modernText = '#4A2C2A'; // default cake brown
         if (activeNiche === 'Sneakers') {
@@ -315,6 +319,7 @@ const SaaSPage = () => {
           mutedText: '#64748B',
           dividerColor: 'rgba(0,0,0,0.03)'
         };
+      }
     }
   };
 
@@ -647,15 +652,42 @@ const SaaSPage = () => {
                   backdropFilter: 'blur(16px)',
                   border: '1px solid rgba(15, 23, 42, 0.08)',
                   borderRadius: '16px',
-                  padding: '1rem',
+                  padding: '1.2rem 1.8rem 1rem 1rem',
                   marginBottom: '0.6rem',
                   boxShadow: '0 10px 30px -10px rgba(15, 23, 42, 0.15)',
                   display: 'flex',
                   alignItems: 'flex-start',
                   gap: '0.8rem',
-                  pointerEvents: 'auto'
+                  pointerEvents: 'auto',
+                  position: 'relative'
                 }}
               >
+                {/* Close Button Cross */}
+                <button
+                  onClick={() => dismissActivity(act.id)}
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: t.textMuted,
+                    opacity: 0.6,
+                    padding: '2px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '50%',
+                    transition: 'all 0.2s ease',
+                    outline: 'none'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = 1}
+                  onMouseLeave={e => e.currentTarget.style.opacity = 0.6}
+                >
+                  <X size={12} />
+                </button>
+
                 <div style={{
                   width: '8px',
                   height: '8px',

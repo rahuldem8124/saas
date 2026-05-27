@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, ShoppingBag, Users, DollarSign, BarChart2, Truck, Ticket, Settings as SettingsIcon, MessageSquare, Package, ChevronRight, MoreVertical, Eye, Heart, Layers, ArrowUp, ArrowDown, Clipboard, Award, ShieldAlert, Thermometer, Palette } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Users, DollarSign, BarChart2, Truck, Ticket, Settings as SettingsIcon, MessageSquare, Package, ChevronRight, MoreVertical, Eye, Heart, Layers, ArrowUp, ArrowDown, Clipboard, Award, ShieldAlert, Thermometer, Palette, Star } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -8,7 +8,7 @@ import AdminNavbar from '../components/AdminNavbar';
 
 const AdminDashboard = () => {
   const { user, switchRole } = useAuth();
-  const { businesses, selectBusiness, updateBusiness, topUpMessageQuota, PLAN_LIMITS } = useTenant();
+  const { businesses, selectBusiness, updateBusiness, editProduct, topUpMessageQuota, PLAN_LIMITS } = useTenant();
   const location = useLocation();
 
   const activeBizId = user?.businessId || 'cakeflow';
@@ -16,9 +16,16 @@ const AdminDashboard = () => {
 
   const orders = biz.orders || [];
   
+  // Message quota top up states
+  const [topUpQuantity, setTopUpQuantity] = useState(100);
+  const [showTopUpPay, setShowTopUpPay] = useState(false);
+  const [topUpPayMethod, setTopUpPayMethod] = useState('UPI');
+  const [isProcessingTopUp, setIsProcessingTopUp] = useState(false);
+
   // Custom Dashboard drag-and-drop modules for "Custom" category
   const [customModules, setCustomModules] = useState([
     { id: 'orders', name: 'Orders Analytics', visible: true },
+    { id: 'products', name: 'Storefront Product Selector', visible: true },
     { id: 'inventory', name: 'Inventory & Sizes', visible: true },
     { id: 'analytics', name: 'Weekly Revenue Trends', visible: true },
     { id: 'payments', name: 'Simulated Gateway Logs', visible: true },
@@ -42,7 +49,10 @@ const AdminDashboard = () => {
   };
 
   // Compute dynamic stats
-  const totalRevenue = orders.reduce((sum, o) => sum + parseFloat(o.amount.replace('$', '') || 0), 0);
+  const totalRevenue = orders.reduce((sum, o) => {
+    const amtStr = o.amount ? String(o.amount) : '0';
+    return sum + parseFloat(amtStr.replace(/[^0-9.]/g, '') || 0);
+  }, 0);
   const pendingCount = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length;
   const completedCount = orders.filter(o => o.status === 'Delivered').length;
 
@@ -51,7 +61,7 @@ const AdminDashboard = () => {
       `===============================\n` +
       `Generated on: ${new Date().toLocaleString()}\n\n` +
       `Total Scoped Orders: ${orders.length}\n` +
-      `Total Cumulative Revenue: $${totalRevenue.toFixed(2)}\n` +
+      `Total Cumulative Revenue: ₹${totalRevenue.toFixed(2)}\n` +
       `Pending Deliveries: ${pendingCount}\n` +
       `Category: ${biz.category}\n` +
       `Subscription Gate: ${biz.subscription}\n`;
@@ -191,7 +201,7 @@ const AdminDashboard = () => {
               {biz.category} Dashboard
             </h1>
             <p style={{ color: 'var(--color-brown)', fontSize: '1.1rem', opacity: 0.8 }}>
-              Managing <b>{biz.name}</b> scoping ({biz.subscription} Plan).
+              Managing <b>{biz.name}</b> scoping (🛡️ Custom Modular Plan).
             </p>
           </div>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
@@ -199,6 +209,48 @@ const AdminDashboard = () => {
             <Link to="/admin/products" className="btn-primary" style={{ padding: '0.8rem 1.5rem', fontSize: '1.05rem', textDecoration: 'none' }}>+ Add Scoped Product</Link>
           </div>
         </header>
+
+        {/* Storefront Share Center Banner */}
+        <section className="card" style={{ 
+          background: 'linear-gradient(135deg, #FFF5F6, #FFF9FA)', 
+          padding: '2rem 2.5rem', 
+          borderRadius: '24px', 
+          boxShadow: '0 10px 30px rgba(242, 140, 163, 0.05)', 
+          border: '1px solid rgba(242, 140, 163, 0.25)', 
+          marginBottom: '4.5rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1.5rem',
+          boxSizing: 'border-box'
+        }}>
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(242, 140, 163, 0.15)', color: 'var(--color-pink)', padding: '4px 10px', borderRadius: '8px', fontSize: '0.75rem', fontWeight: 900, marginBottom: '0.6rem' }}>
+              <Palette size={12} /> STOREFRONT PUBLIC SHARING HUB
+            </div>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--color-brown-dark)', margin: 0 }}>Share Your Public Storefront Catalog</h3>
+            <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: 'var(--color-brown)', opacity: 0.8, fontWeight: 600 }}>
+              Copy this link and share it on your Instagram bio, WhatsApp catalog, or business cards so buyers can place orders directly!
+            </p>
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+            <div style={{ background: '#FFFFFF', padding: '0.7rem 1.2rem', borderRadius: '12px', border: '1px solid rgba(122, 78, 58, 0.15)', fontSize: '0.9rem', fontWeight: 800, color: 'var(--color-brown-dark)', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span>{window.location.origin}/store/{activeBizId}</span>
+            </div>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/store/${activeBizId}`);
+                alert("📋 Storefront public URL copied to clipboard! You can now share it with your customers.");
+              }}
+              className="btn-primary"
+              style={{ padding: '0.7rem 1.4rem', borderRadius: '12px', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
+            >
+              <Clipboard size={14} /> Copy Storefront Link
+            </button>
+          </div>
+        </section>
 
         {/* Automated Social Messaging Hub */}
         <section className="card" style={{ 
@@ -221,7 +273,7 @@ const AdminDashboard = () => {
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-brown-dark)' }}>Active Subscription:</span>
               <span style={{ background: 'var(--color-brown-dark)', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 900 }}>
-                {biz.subscription} Plan
+                🛡️ Custom Modular Plan
               </span>
             </div>
           </div>
@@ -229,7 +281,9 @@ const AdminDashboard = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '3rem', flexWrap: 'wrap' }}>
             {/* Left Side: Channel Selector & Dynamic Pricing */}
             <div style={{ borderRight: '1px solid #F3F4F6', paddingRight: '3rem' }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--color-brown-dark)', marginBottom: '1rem' }}>1. Select Automation Channel</h3>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--color-brown-dark)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                1. Select Automation Channel
+              </h3>
               <p style={{ fontSize: '0.8rem', color: 'var(--color-brown)', opacity: 0.8, marginBottom: '1.5rem', fontWeight: 600 }}>
                 Choose the social media channels through which your customers receive automated order confirmations, receipts, and customer service chats.
               </p>
@@ -237,9 +291,9 @@ const AdminDashboard = () => {
               {/* Toggles */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
                 {[
-                  { channel: "WhatsApp", cost: 0.01, label: "WhatsApp Bot Automation", desc: "Send automated messages to WhatsApp numbers.", icon: "🟢", bg: 'rgba(16, 185, 129, 0.04)', border: 'rgba(16, 185, 129, 0.15)', activeColor: '#10B981' },
-                  { channel: "Instagram", cost: 0.008, label: "Instagram Direct Automation", desc: "Interact via Instagram direct messages and comments.", icon: "🔵", bg: 'rgba(59, 130, 246, 0.04)', border: 'rgba(59, 130, 246, 0.15)', activeColor: '#3B82F6' },
-                  { channel: "WhatsApp + Instagram", cost: 0.015, label: "Multi-Channel Automation (Both)", desc: "Synchronize both platforms under a single bot.", icon: "🟣", bg: 'rgba(139, 92, 246, 0.04)', border: 'rgba(139, 92, 246, 0.15)', activeColor: '#8B5CF6' }
+                  { channel: "WhatsApp", cost: 0.60, label: "WhatsApp Bot Automation", desc: "Send automated messages to WhatsApp numbers.", icon: "🟢", bg: 'rgba(16, 185, 129, 0.04)', border: 'rgba(16, 185, 129, 0.15)', activeColor: '#10B981' },
+                  { channel: "Instagram", cost: 0.40, label: "Instagram Direct Automation", desc: "Interact via Instagram direct messages and comments.", icon: "🔵", bg: 'rgba(59, 130, 246, 0.04)', border: 'rgba(59, 130, 246, 0.15)', activeColor: '#3B82F6' },
+                  { channel: "WhatsApp + Instagram", cost: 0.90, label: "Multi-Channel Automation (Both)", desc: "Synchronize both platforms under a single bot.", icon: "🟣", bg: 'rgba(139, 92, 246, 0.04)', border: 'rgba(139, 92, 246, 0.15)', activeColor: '#8B5CF6' }
                 ].map((tier) => {
                   const isActive = (biz.automationChannel || "WhatsApp") === tier.channel;
                   return (
@@ -273,7 +327,7 @@ const AdminDashboard = () => {
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <span style={{ display: 'block', fontSize: '0.95rem', fontWeight: 900, color: isActive ? tier.activeColor : 'var(--color-brown-dark)' }}>
-                          ${tier.cost.toFixed(3)}
+                          ₹{tier.cost.toFixed(2)}
                         </span>
                         <span style={{ fontSize: '0.65rem', color: 'var(--color-brown)', opacity: 0.5, fontWeight: 700 }}>PER MESSAGE</span>
                       </div>
@@ -283,7 +337,7 @@ const AdminDashboard = () => {
               </div>
 
               {/* Simulated Billing Projection */}
-              <div style={{ background: 'var(--color-cream)', padding: '1.5rem', borderRadius: '16px', border: '1px dashed rgba(122, 78, 58, 0.15)' }}>
+              <div style={{ background: '#F8FAFC', padding: '1.5rem', borderRadius: '16px', border: '1px dashed rgba(15, 23, 42, 0.15)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <span style={{ fontSize: '0.7rem', color: 'var(--color-pink)', fontWeight: 900, textTransform: 'uppercase', display: 'block' }}>SIMULATED ACCRUED BILLING</span>
@@ -291,7 +345,7 @@ const AdminDashboard = () => {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '1.8rem', fontWeight: 950, color: 'var(--color-brown-dark)' }}>
-                      ${((biz.messagesUsed || 0) * (biz.perMessageCost || 0.01)).toFixed(2)}
+                      ₹{((biz.messagesUsed || 0) * (biz.perMessageCost || 0.60)).toFixed(2)}
                     </div>
                     <span style={{ fontSize: '0.65rem', color: 'var(--color-brown)', opacity: 0.6, fontWeight: 800 }}>ESTIMATED COST</span>
                   </div>
@@ -300,115 +354,274 @@ const AdminDashboard = () => {
             </div>
 
             {/* Right Side: Quotas, Remaining limit, Top up */}
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               <div>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--color-brown-dark)', marginBottom: '1rem' }}>2. Subscription Quota & Used</h3>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--color-brown-dark)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  2. WhatsApp Usage & Quota limits
+                </h3>
                 
-                {/* Quota limit bars */}
+                {/* Quota limit calculations */}
                 {(() => {
                   const limits = PLAN_LIMITS[biz.subscription] || PLAN_LIMITS['Basic'];
-                  const orderCount = orders.length;
-                  const orderLimit = limits.orders;
-                  const isOrdersUnlimited = orderLimit === Infinity;
-                  const ordersPercent = isOrdersUnlimited ? 0 : Math.min((orderCount / orderLimit) * 100, 100);
-
-                  const msgUsed = biz.messagesUsed || 0;
-                  const baseMsgLimit = limits.messages;
+                  const baseMsgLimit = biz.whatsappMessagesCount || (limits.messages === Infinity ? 5000 : limits.messages);
                   const topUpCount = biz.topUpMessages || 0;
-                  const isMessagesUnlimited = baseMsgLimit === Infinity;
-                  const msgLimit = isMessagesUnlimited ? Infinity : baseMsgLimit + topUpCount;
-                  const msgRemaining = isMessagesUnlimited ? Infinity : Math.max(msgLimit - msgUsed, 0);
-                  const msgPercent = isMessagesUnlimited ? 0 : Math.min((msgUsed / msgLimit) * 100, 100);
-
-                  const isLowOnMessages = !isMessagesUnlimited && (msgRemaining / msgLimit) < 0.15;
+                  const totalLimit = baseMsgLimit + topUpCount;
+                  const messagesUsedCount = biz.messagesUsed || 0;
+                  const remainingCount = Math.max(totalLimit - messagesUsedCount, 0);
+                  const progressPercentage = Math.min((messagesUsedCount / totalLimit) * 100, 100);
+                  const isLowOnCredits = remainingCount / totalLimit < 0.20;
 
                   return (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.8rem' }}>
-                      {/* Orders limit bar */}
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-brown-dark)', marginBottom: '0.5rem' }}>
-                          <span>Orders Processed: {orderCount} / {isOrdersUnlimited ? '∞' : orderLimit}</span>
-                          <span style={{ color: 'var(--color-pink)' }}>
-                            {isOrdersUnlimited ? 'Unlimited' : `${ordersPercent.toFixed(0)}%`}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      {/* WhatsApp Usage Progress */}
+                      <div style={{ background: '#F8FAFC', padding: '1.5rem', borderRadius: '18px', border: '1px solid rgba(0,0,0,0.04)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.8rem' }}>
+                          <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--color-brown-dark)' }}>WhatsApp Usage</span>
+                          <span style={{ fontSize: '1.3rem', fontWeight: 900, color: 'var(--color-brown-dark)' }}>
+                            {messagesUsedCount} <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#64748B' }}>/ {totalLimit} messages</span>
                           </span>
                         </div>
-                        <div style={{ width: '100%', height: '8px', background: 'var(--color-cream)', borderRadius: '4px', overflow: 'hidden' }}>
-                          <div style={{ width: `${isOrdersUnlimited ? 100 : ordersPercent}%`, height: '100%', background: 'var(--gradient-pink)', borderRadius: '4px' }} />
+
+                        {/* Progress Bar */}
+                        <div style={{ width: '100%', height: '10px', background: '#E2E8F0', borderRadius: '5px', overflow: 'hidden', marginBottom: '1rem' }}>
+                          <div 
+                            style={{ 
+                              width: `${progressPercentage}%`, 
+                              height: '100%', 
+                              background: isLowOnCredits ? 'linear-gradient(90deg, #EF4444, #F87171)' : 'linear-gradient(90deg, #10B981, #34D399)', 
+                              borderRadius: '5px' 
+                            }} 
+                          />
                         </div>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--color-brown)', opacity: 0.6, fontWeight: 700, display: 'block', marginTop: '4px' }}>
-                          Quota resets at the start of your monthly billing cycle.
-                        </span>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B' }}>
+                            🔄 Quota resets on June 25, 2026
+                          </span>
+                          <span style={{ background: isLowOnCredits ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)', color: isLowOnCredits ? '#EF4444' : '#10B981', padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800 }}>
+                            {remainingCount} remaining
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Messages limit bar */}
+                      {/* Usage History Terminal Box */}
                       <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-brown-dark)', marginBottom: '0.5rem' }}>
-                          <span>Messages Automated: {msgUsed} / {isMessagesUnlimited ? '∞' : msgLimit}</span>
-                          <span style={{ color: isLowOnMessages ? '#EF4444' : '#10B981' }}>
-                            {isMessagesUnlimited ? 'Unlimited' : `${msgPercent.toFixed(0)}%`}
-                          </span>
-                        </div>
-                        <div style={{ width: '100%', height: '8px', background: 'var(--color-cream)', borderRadius: '4px', overflow: 'hidden' }}>
-                          <div style={{ width: `${isMessagesUnlimited ? 100 : msgPercent}%`, height: '100%', background: isMessagesUnlimited ? '#10B981' : isLowOnMessages ? '#EF4444' : '#10B981', borderRadius: '4px' }} />
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-                          <span style={{ fontSize: '0.7rem', color: 'var(--color-brown)', opacity: 0.6, fontWeight: 700 }}>
-                            {biz.topUpMessages > 0 ? `Includes +${biz.topUpMessages} top-up credits.` : 'Base plan allotment active.'}
-                          </span>
-                          <span style={{ 
-                            fontSize: '0.85rem', 
-                            fontWeight: 900, 
-                            color: isLowOnMessages ? '#EF4444' : 'var(--color-brown-dark)',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}>
-                            {isLowOnMessages && "⚠️"} {isMessagesUnlimited ? 'Unlimited' : `${msgRemaining.toLocaleString()} remaining`}
-                          </span>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--color-brown-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '0.6rem' }}>
+                          Active Automated Notification Logs
+                        </span>
+                        <div style={{ 
+                          background: '#0F172A', 
+                          borderRadius: '12px', 
+                          padding: '1rem', 
+                          fontFamily: 'monospace', 
+                          fontSize: '0.75rem', 
+                          color: '#38BDF8', 
+                          height: '100px', 
+                          overflowY: 'auto',
+                          border: '1px solid rgba(255,255,255,0.08)',
+                          boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.5)'
+                        }} className="no-scrollbar">
+                          <div style={{ color: '#64748B', marginBottom: '4px' }}>[SYSTEM] Webhook listener connected on port 443...</div>
+                          {orders.slice(0, 3).map((ord, idx) => (
+                            <div key={idx} style={{ marginBottom: '4px', lineHeight: 1.4 }}>
+                              <span style={{ color: '#10B981' }}>[OK]</span> [{ord.date || 'Today'}] Auto confirm sent to {ord.email || 'customer'} (Amt: {ord.amount}, Status: {ord.status})
+                            </div>
+                          ))}
+                          <div style={{ color: '#E2E8F0' }}>[OK] Quota verify complete. WhatsApp automated trigger healthy.</div>
                         </div>
                       </div>
+
                     </div>
                   );
                 })()}
               </div>
 
               {/* Refill credits action */}
-              <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #F3F4F6' }}>
-                <h4 style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--color-brown-dark)', margin: '0 0 0.8rem' }}>3. Refill Message Credits</h4>
-                <p style={{ fontSize: '0.75rem', color: 'var(--color-brown)', opacity: 0.7, margin: '0 0 1rem', fontWeight: 600 }}>
-                  Need more messaging capacity? Top up your account instantly. Refilled credits do not expire and carry over monthly.
-                </p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem' }}>
-                  {[
-                    { amount: 500, label: "+500 Msgs", desc: "$5.00" },
-                    { amount: 1000, label: "+1k Msgs", desc: "$9.00" },
-                    { amount: 5000, label: "+5k Msgs", desc: "$40.00" }
-                  ].map((pkg) => (
+              <div style={{ borderTop: '1px solid #F3F4F6', paddingTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 900, color: 'var(--color-brown-dark)', margin: '0 0 4px' }}>3. Refill Message Credits</h4>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--color-brown)', opacity: 0.7, margin: '0', fontWeight: 600 }}>
+                    Adjust extra social message refills in steps of <b>50 messages</b> (₹25 per 50 block):
+                  </p>
+                </div>
+
+                <div style={{ background: '#FFF8F3', padding: '1rem', borderRadius: '16px', border: '1px solid rgba(122,78,58,0.08)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.8rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
                     <button
-                      key={pkg.amount}
+                      type="button"
                       onClick={() => {
-                        topUpMessageQuota(activeBizId, pkg.amount);
-                        alert(`🎉 Successfully added +${pkg.amount.toLocaleString()} social messaging credits to ${biz.name}!`);
+                        if (topUpQuantity > 50) setTopUpQuantity(prev => prev - 50);
                       }}
-                      className="btn-secondary touch-friendly"
+                      disabled={topUpQuantity <= 50}
                       style={{
-                        padding: '0.6rem',
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        border: '1px solid rgba(0,0,0,0.1)',
+                        background: topUpQuantity <= 50 ? '#F1F5F9' : '#FFFFFF',
+                        color: topUpQuantity <= 50 ? '#94A3B8' : 'var(--color-brown-dark)',
+                        fontSize: '1.1rem',
+                        fontWeight: 'bold',
+                        cursor: topUpQuantity <= 50 ? 'not-allowed' : 'pointer',
                         display: 'flex',
-                        flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        borderRadius: '12px',
-                        border: '1px solid rgba(122, 78, 58, 0.2)',
-                        background: 'white',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        gap: '2px'
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                        outline: 'none'
                       }}
                     >
-                      <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-brown-dark)' }}>{pkg.label}</span>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--color-pink)', fontWeight: 800 }}>{pkg.desc}</span>
+                      −
                     </button>
-                  ))}
+
+                    <div style={{ textAlign: 'center', width: '130px' }}>
+                      <div style={{ fontSize: '1.6rem', fontWeight: 950, color: 'var(--color-brown-dark)', letterSpacing: '-0.5px' }}>
+                        +{topUpQuantity}
+                      </div>
+                      <span style={{ fontSize: '0.65rem', color: 'var(--color-brown)', opacity: 0.6, fontWeight: 800, textTransform: 'uppercase', display: 'block' }}>
+                        Refill Messages
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setTopUpQuantity(prev => prev + 50)}
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        border: '1px solid rgba(0,0,0,0.1)',
+                        background: '#FFFFFF',
+                        color: 'var(--color-brown-dark)',
+                        fontSize: '1.1rem',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                        outline: 'none'
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-pink)', fontWeight: 850 }}>
+                     Billed Cost: ₹{Math.round((topUpQuantity / 50) * 25)}
+                  </span>
+                </div>
+
+                {showTopUpPay ? (
+                  <div style={{ background: '#0F172A', color: 'white', padding: '1rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button 
+                        type="button"
+                        onClick={() => setTopUpPayMethod('UPI')} 
+                        style={{ flex: 1, padding: '4px', borderRadius: '6px', border: 'none', background: topUpPayMethod === 'UPI' ? 'var(--color-pink)' : 'rgba(255,255,255,0.05)', color: 'white', fontWeight: 800, fontSize: '0.7rem', cursor: 'pointer' }}
+                      >
+                        UPI QR
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => setTopUpPayMethod('Card')} 
+                        style={{ flex: 1, padding: '4px', borderRadius: '6px', border: 'none', background: topUpPayMethod === 'Card' ? 'var(--color-pink)' : 'rgba(255,255,255,0.05)', color: 'white', fontWeight: 800, fontSize: '0.7rem', cursor: 'pointer' }}
+                      >
+                        Card
+                      </button>
+                    </div>
+
+                    {topUpPayMethod === 'UPI' ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: '#FFFFFF', padding: '6px', borderRadius: '8px', color: '#0F172A' }}>
+                        <div style={{ width: '60px', height: '60px', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', fontWeight: 900, fontSize: '0.55rem', border: '1.5px solid #E2E8F0', padding: '4px', boxSizing: 'border-box', textAlign: 'center' }}>
+                          [QR ₹{Math.round((topUpQuantity / 50) * 25)}]
+                        </div>
+                        <span style={{ fontSize: '0.6rem', color: '#64748B', fontWeight: 800 }}>Scan QR via GPay / PhonePe</span>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <input 
+                          type="text" 
+                          placeholder="4111 2222 3333 4444" 
+                          maxLength="19"
+                          style={{ padding: '6px 8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white', fontSize: '0.75rem', fontWeight: 600, outline: 'none' }}
+                        />
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          <input 
+                            type="text" 
+                            placeholder="MM/YY" 
+                            style={{ flex: 1, padding: '6px 8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white', fontSize: '0.75rem', fontWeight: 600, outline: 'none' }}
+                          />
+                          <input 
+                            type="password" 
+                            placeholder="CVV" 
+                            maxLength="3"
+                            style={{ flex: 1, padding: '6px 8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white', fontSize: '0.75rem', fontWeight: 600, outline: 'none' }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      disabled={isProcessingTopUp}
+                      onClick={() => {
+                        setIsProcessingTopUp(true);
+                        setTimeout(() => {
+                          setIsProcessingTopUp(false);
+                          setShowTopUpPay(false);
+                          topUpMessageQuota(activeBizId, topUpQuantity);
+                          alert(`🎉 Refill secured! Successfully added +${topUpQuantity} social messages to ${biz.name} quota limits!`);
+                        }, 1200);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        background: 'var(--gradient-pink)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: 900,
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 10px rgba(242,140,163,0.2)'
+                      }}
+                    >
+                      {isProcessingTopUp ? '🔄 Processing Top-up...' : `Verify Payment & Refill`}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowTopUpPay(true)}
+                    style={{
+                      width: '100%',
+                      background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.8rem',
+                      borderRadius: '12px',
+                      fontSize: '0.85rem',
+                      fontWeight: 900,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px',
+                      boxShadow: '0 8px 20px -5px rgba(79, 70, 229, 0.3)',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    Pay & Refill extra credits ➔
+                  </button>
+                )}
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+                  <Link 
+                    to="/admin/settings?tab=Billing & Gates"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(122, 78, 58, 0.15)', color: 'var(--color-brown-dark)', padding: '0.6rem 1.2rem', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 800, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none' }}
+                  >
+                    Customize Plan Scope <ChevronRight size={12} />
+                  </Link>
                 </div>
               </div>
             </div>
@@ -424,7 +637,7 @@ const AdminDashboard = () => {
                 { label: "Today's Orders", value: orders.length.toString(), icon: <ShoppingBag />, trend: "Baking priority queue active" },
                 { label: "Upcoming Deliveries", value: "1", icon: <Truck />, trend: "Schedule synced tomorrow" },
                 { label: "Cake Requests", value: "2", icon: <Layers />, trend: "Custom field inspiration uploaded" },
-                { label: "Revenue Scoped", value: `$${totalRevenue.toFixed(2)}`, icon: <DollarSign />, trend: "Fully paid in escrow" }
+                { label: "Revenue Scoped", value: `₹${totalRevenue.toFixed(2)}`, icon: <DollarSign />, trend: "Fully paid in escrow" }
               ].map((stat, i) => (
                 <div key={i} className="card" style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', background: 'white' }}>
                   <div>
@@ -483,7 +696,7 @@ const AdminDashboard = () => {
                 { label: "Active Inventory", value: "3 models", icon: <Package />, trend: "95 stock active" },
                 { label: "Sizes Scoped", value: "US 7 - 11", icon: <Layers />, trend: "Standard fits synced" },
                 { label: "Pending Orders", value: pendingCount.toString(), icon: <ShoppingBag />, trend: "Ready for courier dispatch" },
-                { label: "Total Revenue", value: `$${totalRevenue.toFixed(2)}`, icon: <DollarSign />, trend: "Courier payouts pending" }
+                { label: "Total Revenue", value: `₹${totalRevenue.toFixed(2)}`, icon: <DollarSign />, trend: "Courier payouts pending" }
               ].map((stat, i) => (
                 <div key={i} className="card" style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', background: 'white' }}>
                   <div>
@@ -527,7 +740,7 @@ const AdminDashboard = () => {
                 { label: "Active Apparel Collection", value: `${biz.products.length} Items`, icon: <Package />, trend: "Essentials & Outerwear active" },
                 { label: "Top Selected Silhouette", value: "Oversized Fit", icon: <Layers />, trend: "82% of buyers prefer relaxed cuts" },
                 { label: "Monogram Requests", value: orders.filter(o => o.customFields?.monogram).length.toString(), icon: <Award />, trend: "Custom embroidery queue" },
-                { label: "Apparel Revenue", value: `$${totalRevenue.toFixed(2)}`, icon: <DollarSign />, trend: "Merchant payout cleared" }
+                { label: "Apparel Revenue", value: `₹${totalRevenue.toFixed(2)}`, icon: <DollarSign />, trend: "Merchant payout cleared" }
               ].map((stat, i) => (
                 <div key={i} className="card" style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', background: 'white' }}>
                   <div>
@@ -598,7 +811,7 @@ const AdminDashboard = () => {
                 { label: "Trending Pieces", value: "Celestial Hoops", icon: <Award />, trend: "Top engagement this week" },
                 { label: "Metal Polish", value: "18k Rose Gold", icon: <Palette />, trend: "Most chosen variable" },
                 { label: "Active Orders", value: orders.length.toString(), icon: <ShoppingBag />, trend: "Engraving customizations pending" },
-                { label: "Boutique Revenue", value: `$${totalRevenue.toFixed(2)}`, icon: <DollarSign />, trend: "Processed in full" }
+                { label: "Boutique Revenue", value: `₹${totalRevenue.toFixed(2)}`, icon: <DollarSign />, trend: "Processed in full" }
               ].map((stat, i) => (
                 <div key={i} className="card" style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', background: 'white' }}>
                   <div>
@@ -623,7 +836,7 @@ const AdminDashboard = () => {
                 { label: "Build Queue", value: "Queue #3", icon: <Clipboard />, trend: "Next up: Hand-painted mug" },
                 { label: "Custom Uploads", value: "1 reference", icon: <Layers />, trend: "Customer attachment synced" },
                 { label: "Orders Pending", value: pendingCount.toString(), icon: <ShoppingBag />, trend: "Materials prepared" },
-                { label: "Revenue", value: `$${totalRevenue.toFixed(2)}`, icon: <DollarSign />, trend: "Payout verified" }
+                { label: "Revenue", value: `₹${totalRevenue.toFixed(2)}`, icon: <DollarSign />, trend: "Payout verified" }
               ].map((stat, i) => (
                 <div key={i} className="card" style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', background: 'white' }}>
                   <div>
@@ -695,17 +908,77 @@ const AdminDashboard = () => {
             </div>
             
             {/* Scoped metrics rendering below reordered dashboard */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
               {customModules.filter(m => m.visible).map(mod => (
-                <div key={mod.id} className="card" style={{ background: 'white', padding: '2rem' }}>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 900, marginBottom: '1rem', borderBottom: '1px solid var(--color-cream)', paddingBottom: '0.8rem' }}>{mod.name}</h3>
-                  {mod.id === 'orders' && <div>Orders Active: <b>{orders.length}</b></div>}
-                  {mod.id === 'inventory' && <div>Products catalog count: <b>{biz.products.length}</b></div>}
-                  {mod.id === 'analytics' && <div>Gross Scoped Revenues: <b>${totalRevenue.toFixed(2)}</b></div>}
-                  {mod.id === 'payments' && <div>Gateway checkout simulation: <b style={{ color: '#4CAF50' }}>Enabled</b></div>}
-                  {mod.id === 'delivery' && <div>Courier integration status: <b>Active</b></div>}
-                  {mod.id === 'customers' && <div>Seeded customer registry synced.</div>}
-                  {mod.id === 'chat' && <div>Bot automated response rate: <b style={{ color: 'var(--color-pink)' }}>100%</b></div>}
+                <div key={mod.id} className="card" style={{ background: 'white', padding: '2rem', display: 'flex', flexDirection: 'column' }}>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 900, marginBottom: '1rem', borderBottom: '1px solid var(--color-cream)', paddingBottom: '0.8rem', color: 'var(--color-brown-dark)', textAlign: 'left' }}>{mod.name}</h3>
+                  {mod.id === 'orders' && <div style={{ fontSize: '0.9rem', color: 'var(--color-brown)' }}>Orders Active: <b>{orders.length}</b></div>}
+                  {mod.id === 'inventory' && <div style={{ fontSize: '0.9rem', color: 'var(--color-brown)' }}>Products catalog count: <b>{biz.products.length}</b></div>}
+                  {mod.id === 'analytics' && <div style={{ fontSize: '0.9rem', color: 'var(--color-brown)' }}>Gross Scoped Revenues: <b>${totalRevenue.toFixed(2)}</b></div>}
+                  {mod.id === 'payments' && <div style={{ fontSize: '0.9rem', color: 'var(--color-brown)' }}>Gateway checkout simulation: <b style={{ color: '#4CAF50' }}>Enabled</b></div>}
+                  {mod.id === 'delivery' && <div style={{ fontSize: '0.9rem', color: 'var(--color-brown)' }}>Courier integration status: <b>Active</b></div>}
+                  {mod.id === 'customers' && <div style={{ fontSize: '0.9rem', color: 'var(--color-brown)' }}>Seeded customer registry synced.</div>}
+                  {mod.id === 'chat' && <div style={{ fontSize: '0.9rem', color: 'var(--color-brown)' }}>Bot automated response rate: <b style={{ color: 'var(--color-pink)' }}>100%</b></div>}
+                  {mod.id === 'products' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--color-brown)', opacity: 0.8, margin: 0, textAlign: 'left', lineHeight: '1.4' }}>
+                        Toggle visibility of products in your public storefront or mark items as featured to badge them.
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', maxHeight: '250px', overflowY: 'auto', paddingRight: '4px' }}>
+                        {biz.products.map(p => {
+                          const isActive = p.isActive !== false;
+                          const isFeatured = p.isFeatured === true;
+                          return (
+                            <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.8rem', background: 'var(--color-cream)', borderRadius: '12px', border: '1px solid rgba(0,0,0,0.04)', transition: 'all 0.2s' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <img src={p.image} style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' }} alt={p.name} />
+                                <div style={{ textAlign: 'left' }}>
+                                  <div style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--color-brown-dark)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>{p.name}</div>
+                                  <div style={{ fontSize: '0.75rem', color: 'var(--color-pink)', fontWeight: 800 }}>{p.price}</div>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <button
+                                  onClick={() => editProduct(biz.id, { ...p, isActive: !isActive })}
+                                  style={{
+                                    padding: '4px 10px',
+                                    borderRadius: '8px',
+                                    fontSize: '0.7rem',
+                                    fontWeight: 900,
+                                    cursor: 'pointer',
+                                    background: isActive ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)' : '#E2E8F0',
+                                    color: isActive ? 'white' : '#64748B',
+                                    border: 'none',
+                                    transition: 'all 0.2s'
+                                  }}
+                                >
+                                  {isActive ? "ACTIVE" : "INACTIVE"}
+                                </button>
+                                <button
+                                  onClick={() => editProduct(biz.id, { ...p, isFeatured: !isFeatured })}
+                                  style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    background: isFeatured ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' : '#E2E8F0',
+                                    color: isFeatured ? 'white' : '#64748B',
+                                    border: 'none',
+                                    transition: 'all 0.2s'
+                                  }}
+                                >
+                                  <Star size={12} fill={isFeatured ? "white" : "none"} stroke={isFeatured ? "none" : "#64748B"} />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

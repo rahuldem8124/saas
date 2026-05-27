@@ -48,8 +48,10 @@ const Navbar = () => {
     location.pathname.startsWith('/saas') || 
     location.pathname.startsWith('/super-admin') || 
     location.pathname.startsWith('/admin') || 
-    (isStorefront && !location.pathname.startsWith('/store/cakeflow-legacy'));
-  
+    location.pathname.startsWith('/simulator');
+
+  const isSimulator = location.pathname.startsWith('/simulator');
+
   const isRetailStore = !isSaaSActive;
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -63,8 +65,17 @@ const Navbar = () => {
   
   const isProfilePage = location.pathname === '/profile';
   
-  const renderShopFlowNav = isProfilePage ? fromSaaS : true;
-  const renderCakeFlowNav = isProfilePage ? !fromSaaS : !isSaaSActive;
+  // Clean mutual exclusion: Render ShopFlow SaaS navbar ONLY on SaaS Platform pages
+  const isSaaSPlatformPage = 
+    location.pathname === '/' ||
+    location.pathname.startsWith('/saas') || 
+    location.pathname.startsWith('/super-admin') || 
+    location.pathname.startsWith('/admin') || 
+    location.pathname.startsWith('/simulator') ||
+    (isProfilePage && fromSaaS);
+
+  const renderShopFlowNav = isSaaSPlatformPage;
+  const renderCakeFlowNav = !isSaaSPlatformPage;
 
   return (
     <>
@@ -81,10 +92,12 @@ const Navbar = () => {
           alignItems: 'center',
           justifyContent: 'space-between',
           boxSizing: 'border-box',
-          background: scrolled ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.9)',
+          background: isSimulator
+            ? (scrolled ? 'rgba(15, 23, 42, 0.95)' : 'rgba(15, 23, 42, 0.9)')
+            : (scrolled ? 'rgba(248, 250, 252, 0.95)' : 'rgba(248, 250, 252, 0.9)'),
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid #E2E8F0',
+          borderBottom: isSimulator ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
           <div className="nav-left" style={{ display: 'flex', alignItems: 'center', gap: '3rem' }}>
@@ -92,31 +105,34 @@ const Navbar = () => {
               fontFamily: 'var(--font-heading)', 
               fontSize: '2.2rem', 
               fontWeight: 950, 
-              color: '#0F172A',
+              color: isSimulator ? '#FFFFFF' : '#0F172A',
               letterSpacing: '-1.5px',
               textDecoration: 'none'
             }}>
-              ShopFlow<span style={{ color: '#4F46E5' }}>.</span>
+              ShopFlow<span style={{ color: isSimulator ? '#818CF8' : '#4F46E5' }}>.</span>
             </Link>
             
             <div className="hide-on-mobile" style={{ display: 'flex', gap: '2.5rem' }}>
               {[
                 { name: 'SaaS Platform', path: '/saas' },
-                { name: 'Bakery Demo', path: '/store/cakeflow' },
-                { name: 'Sneakers Demo', path: '/store/fastfoot' },
-                { name: 'Apparel Demo', path: '/store/threads-co' }
-              ].map(link => (
-                <Link key={link.name} to={link.path} className="nav-link" style={{ 
-                  fontWeight: 800, 
-                  color: location.pathname === link.path ? '#4F46E5' : '#475569',
-                  fontSize: '1.05rem',
-                  textDecoration: 'none',
-                  opacity: location.pathname === link.path ? 1 : 0.7,
-                  transition: 'all 0.3s ease'
-                }}>
-                  {link.name}
-                </Link>
-              ))}
+                { name: 'Simulator Hub 🎮', path: '/simulator' }
+              ].map(link => {
+                const isActive = location.pathname.startsWith(link.path);
+                return (
+                  <Link key={link.name} to={link.path} className="nav-link" style={{ 
+                    fontWeight: 800, 
+                    color: isActive 
+                      ? (isSimulator ? '#818CF8' : '#4F46E5') 
+                      : (isSimulator ? '#94A3B8' : '#475569'),
+                    fontSize: '1.05rem',
+                    textDecoration: 'none',
+                    opacity: isActive ? 1 : 0.7,
+                    transition: 'all 0.3s ease'
+                  }}>
+                    {link.name}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
@@ -130,7 +146,7 @@ const Navbar = () => {
               style={{ position: 'relative', padding: '0.5rem 0', cursor: 'pointer' }}
             >
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <UserIcon size={26} color="#475569" />
+                <UserIcon size={26} color={isSimulator ? '#94A3B8' : '#475569'} />
               </div>
               
               <AnimatePresence>
@@ -144,8 +160,8 @@ const Navbar = () => {
                       top: '100%',
                       right: 0,
                       width: '200px',
-                      background: 'white',
-                      border: '1px solid #E2E8F0',
+                      background: isSimulator ? '#1E293B' : 'white',
+                      border: isSimulator ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #E2E8F0',
                       borderRadius: '16px',
                       padding: '0.8rem',
                       boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
@@ -155,7 +171,7 @@ const Navbar = () => {
                       gap: '0.4rem'
                     }}
                   >
-                    <span style={{ fontSize: '0.7rem', color: '#64748B', fontWeight: 800, textTransform: 'uppercase', padding: '0.4rem 0.6rem 0.2rem', borderBottom: '1px solid #F1F5F9', display: 'block', textAlign: 'left' }}>
+                    <span style={{ fontSize: '0.7rem', color: isSimulator ? '#94A3B8' : '#64748B', fontWeight: 800, textTransform: 'uppercase', padding: '0.4rem 0.6rem 0.2rem', borderBottom: isSimulator ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #F1F5F9', display: 'block', textAlign: 'left' }}>
                       Quick Actions
                     </span>
                     <Link 
@@ -163,7 +179,7 @@ const Navbar = () => {
                       style={{ 
                         padding: '0.6rem 0.8rem', 
                         borderRadius: '8px', 
-                        color: '#0F172A', 
+                        color: isSimulator ? '#F8FAFC' : '#0F172A', 
                         fontWeight: 700, 
                         fontSize: '0.9rem', 
                         textDecoration: 'none', 
@@ -173,7 +189,7 @@ const Navbar = () => {
                         transition: 'background 0.2s',
                         textAlign: 'left'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = '#F1F5F9'}
+                      onMouseEnter={(e) => e.currentTarget.style.background = isSimulator ? '#334155' : '#F1F5F9'}
                       onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
                     >
                       <UserIcon size={14} /> My Profile
@@ -186,7 +202,7 @@ const Navbar = () => {
                       style={{ 
                         padding: '0.6rem 0.8rem', 
                         borderRadius: '8px', 
-                        color: '#0F172A', 
+                        color: isSimulator ? '#F8FAFC' : '#0F172A', 
                         fontWeight: 700, 
                         fontSize: '0.9rem', 
                         cursor: 'pointer', 
@@ -196,10 +212,10 @@ const Navbar = () => {
                         transition: 'background 0.2s',
                         textAlign: 'left'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = '#F1F5F9'}
+                      onMouseEnter={(e) => e.currentTarget.style.background = isSimulator ? '#334155' : '#F1F5F9'}
                       onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
                     >
-                      <Shield size={14} color="#4F46E5" /> Tenant Admin
+                      <Shield size={14} color="#818CF8" /> Tenant Admin
                     </div>
                     <div 
                       onClick={() => {
@@ -209,7 +225,7 @@ const Navbar = () => {
                       style={{ 
                         padding: '0.6rem 0.8rem', 
                         borderRadius: '8px', 
-                        color: '#0F172A', 
+                        color: isSimulator ? '#F8FAFC' : '#0F172A', 
                         fontWeight: 700, 
                         fontSize: '0.9rem', 
                         cursor: 'pointer', 
@@ -219,10 +235,10 @@ const Navbar = () => {
                         transition: 'background 0.2s',
                         textAlign: 'left'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = '#F1F5F9'}
+                      onMouseEnter={(e) => e.currentTarget.style.background = isSimulator ? '#334155' : '#F1F5F9'}
                       onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
                     >
-                      <Shield size={14} color="#0F172A" /> Super Admin
+                      <Shield size={14} color={isSimulator ? '#E2E8F0' : '#0F172A'} /> Super Admin
                     </div>
                   </motion.div>
                 )}
@@ -269,7 +285,7 @@ const Navbar = () => {
               onClick={() => setIsOpen(true)}
               style={{ padding: '0.5rem' }}
             >
-              <Menu size={28} color="#0F172A" />
+              <Menu size={28} color={isSimulator ? '#FFFFFF' : '#0F172A'} />
             </button>
           </div>
         </nav>
@@ -586,27 +602,31 @@ const Navbar = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {[
+                {(isSaaSActive ? [
+                  { name: 'SaaS Platform', path: '/saas' },
+                  { name: 'Simulator Hub 🎮', path: '/simulator' }
+                ] : [
                   { name: 'Home', path: '/store/cakeflow' },
                   { name: 'Birthday', path: '/birthday' },
                   { name: 'Wedding', path: '/wedding' },
                   { name: 'Exclusives', path: '/exclusives' },
                   { name: 'Custom', path: '/custom' }
-                ].map(link => (
+                ]).map(link => (
                   <Link 
                     key={link.name} 
                     to={link.path} 
                     style={{ 
                       fontSize: '1.6rem', 
                       fontWeight: 800, 
-                      color: 'var(--color-brown-dark)', 
+                      color: isSaaSActive ? '#0F172A' : 'var(--color-brown-dark)', 
                       textDecoration: 'none',
                       padding: '1.2rem',
                       background: 'white',
                       borderRadius: '20px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between'
+                      justifyContent: 'space-between',
+                      border: '1px solid rgba(0,0,0,0.04)'
                     }}
                   >
                     {link.name}

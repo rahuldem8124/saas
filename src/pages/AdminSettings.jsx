@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings as SettingsIcon, LayoutDashboard, ShoppingBag, Package, Users, DollarSign, BarChart2, Truck, Ticket, Eye, User, Bell, Shield, Store, Save, Heart, Layers, MessageSquare, AlertCircle, Plus, Trash2, Award } from 'lucide-react';
+import { Settings as SettingsIcon, LayoutDashboard, ShoppingBag, Package, Users, DollarSign, BarChart2, Truck, Ticket, Eye, User, Bell, Shield, Store, Save, Heart, Layers, MessageSquare, AlertCircle, Plus, Trash2, Award, Check, Zap, RefreshCw, CreditCard, ShieldCheck } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
@@ -13,7 +13,20 @@ const AdminSettings = () => {
   const activeBizId = user?.businessId || 'cakeflow';
   const biz = businesses[activeBizId] || businesses['cakeflow'];
 
-  const [activeTab, setActiveTab] = useState('Storefront Config');
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get('tab');
+    if (tabParam) return tabParam;
+    return 'Storefront Config';
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [location.search]);
 
   // Load custom field configurations
   const [fields, setFields] = useState(biz.fields || []);
@@ -30,6 +43,55 @@ const AdminSettings = () => {
     freeDeliveryLimit: biz.freeDeliveryLimit || '50.00'
   });
 
+  // Custom detailed subscription form states for billing customizer
+  const [selectedFeatures, setSelectedFeatures] = useState(biz.additionalFeatures || []);
+  const [customMessagesCount, setCustomMessagesCount] = useState(biz.whatsappMessagesCount || 200);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('UPI');
+  const [isProcessingPay, setIsProcessingPay] = useState(false);
+
+  // Dynamic cost calculations in Indian Rupees (₹)
+  const getBillingDetails = () => {
+    const baseHosting = 199;
+    
+    let featuresCost = 0;
+    if (selectedFeatures.includes('Advanced Custom Fields Builder')) featuresCost += 150;
+    if (selectedFeatures.includes('AI Chatbot Automation')) featuresCost += 250;
+    if (selectedFeatures.includes('Shipping Integration')) featuresCost += 300;
+    if (selectedFeatures.includes('Advanced Styling Themes')) featuresCost += 100;
+    if (selectedFeatures.includes('Commission-Free Sales')) featuresCost += 200;
+
+    const msgCount = Math.max(200, customMessagesCount || 200);
+    const baseMsgCost = 100;
+    const extraMsgBlocks = Math.max(0, Math.floor((msgCount - 200) / 50));
+    const extraMsgCost = extraMsgBlocks * 25;
+    const totalMsgCost = baseMsgCost + extraMsgCost;
+
+    const subtotal = baseHosting + featuresCost + totalMsgCost;
+    const tax = Math.round(subtotal * 0.18);
+    const total = subtotal + tax;
+
+    return { baseHosting, featuresCost, msgCount, totalMsgCost, subtotal, tax, total };
+  };
+
+  const handleUpdateSubscription = () => {
+    setIsProcessingPay(true);
+    
+    setTimeout(() => {
+      setIsProcessingPay(false);
+      setShowCheckout(false);
+      
+      updateBusiness(biz.id, {
+        isSubscribed: true,
+        subscription: 'Custom Plan',
+        whatsappMessagesCount: customMessagesCount,
+        additionalFeatures: selectedFeatures
+      });
+
+      alert(`🎉 Webpage Subscription and Scope Updated Successfully!\nSelected Features: core webpage catalog + ${selectedFeatures.length} checked add-ons.\nStarting Monthly messages: ${customMessagesCount} messages.\n\nChanges have been synchronized across your tenant environment!`);
+    }, 1200);
+  };
+
   useEffect(() => {
     setSettings({
       name: biz.name || '',
@@ -39,6 +101,8 @@ const AdminSettings = () => {
       freeDeliveryLimit: biz.freeDeliveryLimit || '50.00'
     });
     setFields(biz.fields || []);
+    setSelectedFeatures(biz.additionalFeatures || []);
+    setCustomMessagesCount(biz.whatsappMessagesCount || 200);
   }, [biz]);
 
   const handleSaveSettings = (e) => {
@@ -199,6 +263,32 @@ const AdminSettings = () => {
                   <input type="text" value={settings.whatsappNumber} onChange={e => setSettings({...settings, whatsappNumber: e.target.value})} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '2px solid var(--color-cream)', outline: 'none', boxSizing: 'border-box', fontWeight: 600 }} required />
                 </div>
 
+                {/* Public Storefront link sharing */}
+                <div style={{ background: '#FFF8F3', padding: '1.5rem', borderRadius: '20px', border: '1.5px solid rgba(122, 78, 58, 0.1)', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  <div>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--color-pink)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block' }}>📢 Public Storefront Sharing Link</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--color-brown)', fontWeight: 600 }}>Share this URL so customers can view your catalog and place direct orders:</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <input 
+                      type="text" 
+                      readOnly 
+                      value={`http://localhost:5173/store/${activeBizId}`} 
+                      style={{ flex: 1, padding: '0.8rem 1rem', borderRadius: '10px', border: '2px solid white', background: '#FFFFFF', fontWeight: 800, color: 'var(--color-brown-dark)', fontSize: '0.9rem', outline: 'none' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`http://localhost:5173/store/${activeBizId}`);
+                        alert('📋 Public Storefront URL copied to clipboard!');
+                      }}
+                      style={{ background: 'var(--gradient-pink)', color: 'white', border: 'none', padding: '0.8rem 1.5rem', borderRadius: '10px', fontWeight: 900, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', boxShadow: 'var(--shadow-glow)' }}
+                    >
+                      Copy Link
+                    </button>
+                  </div>
+                </div>
+
                 {/* Delivery parameters */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', background: 'var(--color-cream)', padding: '2rem', borderRadius: '20px' }}>
                   <div className="form-group">
@@ -224,21 +314,18 @@ const AdminSettings = () => {
               <div>
                 
                 {/* Subscription lock on dynamic field builder (Simulated gating) */}
-                {biz.subscription === 'Basic' ? (
-                  <div style={{ background: 'rgba(255, 152, 0, 0.05)', border: '2px dashed #FF9800', padding: '2.5rem', borderRadius: '20px', textAlign: 'center' }}>
-                    <AlertCircle size={40} color="#FF9800" style={{ margin: '0 auto 1.5rem' }} />
-                    <h4 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--color-brown-dark)', marginBottom: '0.8rem' }}>Form Field Builder Locked</h4>
+                {!biz.additionalFeatures?.includes('Advanced Custom Fields Builder') ? (
+                  <div style={{ background: 'rgba(242, 140, 163, 0.05)', border: '2px dashed var(--color-pink)', padding: '2.5rem', borderRadius: '20px', textAlign: 'center' }}>
+                    <AlertCircle size={40} color="var(--color-pink)" style={{ margin: '0 auto 1.5rem' }} />
+                    <h4 style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--color-brown-dark)', marginBottom: '0.8rem' }}>Form Field Builder Integration Inactive</h4>
                     <p style={{ fontSize: '0.9rem', color: 'var(--color-brown)', lineHeight: 1.6, marginBottom: '2rem' }}>
-                      Your store is on the <b>Basic plan</b>. The Custom form fields builder is available exclusively to Pro and Premium subscribers.
+                      The **Advanced Custom Fields Builder** is not active in your storefront plan scope. Enable it in the Billing tab to create custom attributes, dropdown options, and date pickers for customer storefront checkouts.
                     </p>
                     <button 
-                      onClick={() => {
-                        updateBusiness(biz.id, { subscription: 'Pro' });
-                        alert("Upgrade simulated! Plan set to Pro. Refreshing builder capabilities.");
-                      }} 
+                      onClick={() => setActiveTab('Billing & Gates')} 
                       className="btn-primary"
                     >
-                      Upgrade to Pro ($79/mo)
+                      Enable Feature in Plan Scope
                     </button>
                   </div>
                 ) : (
@@ -320,44 +407,356 @@ const AdminSettings = () => {
 
             {/* TAB 3: BILLING & GATES */}
             {activeTab === 'Billing & Gates' && (
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-cream)', padding: '2rem', borderRadius: '20px', marginBottom: '3rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                
+                {/* Active Sub Header Card */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-cream)', padding: '2rem', borderRadius: '20px', border: '1px solid rgba(122,78,58,0.1)' }}>
                   <div>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 800, opacity: 0.6 }}>ACTIVE SUBSCRIPTION</span>
-                    <h2 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--color-pink)', margin: '0.4rem 0' }}>{biz.subscription}</h2>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>Vanity Domain: {biz.id}.platform.com</span>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 800, opacity: 0.6, textTransform: 'uppercase' }}>Active Subscription Scope</span>
+                    <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--color-pink)', margin: '0.3rem 0' }}>
+                      {biz.subscription === 'Custom Plan' ? '🛡️ Custom Modular Plan' : `${biz.subscription} Plan`}
+                    </h2>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-brown)' }}>Store Subdomain: {biz.id}.platform.com</span>
                   </div>
-                  <div style={{ fontSize: '2.5rem', fontWeight: 900 }}>
-                    {biz.subscription === 'Premium' ? "$199" : biz.subscription === 'Pro' ? "$79" : "$29"}<span style={{ fontSize: '0.9rem', opacity: 0.5 }}>/mo</span>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 800, opacity: 0.6, display: 'block' }}>RENEWAL DATE</span>
+                    <b style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--color-brown-dark)' }}>June 25, 2026</b>
                   </div>
                 </div>
 
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 900, marginBottom: '1.5rem' }}>Subscription Tier Action Center</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                  {['Basic', 'Pro', 'Premium'].filter(s => s !== biz.subscription).map(plan => (
-                    <div 
-                      key={plan}
-                      onClick={() => {
-                        updateBusiness(biz.id, { subscription: plan });
-                        alert(`Successfully changed subscription plan to: ${plan}`);
-                      }}
-                      style={{
-                        border: '1px solid rgba(122, 78, 58, 0.1)',
-                        padding: '1.5rem',
-                        borderRadius: '16px',
-                        cursor: 'pointer',
-                        background: 'white',
-                        textAlign: 'center',
-                        boxShadow: 'var(--shadow-soft)'
-                      }}
-                    >
-                      <h5 style={{ margin: '0 0 0.5rem', fontSize: '1rem', fontWeight: 800 }}>Set to {plan}</h5>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--color-pink)', fontWeight: 800 }}>
-                        {plan === 'Premium' ? "$199/mo" : plan === 'Pro' ? "$79/mo" : "$29/mo"}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '2.5rem', alignItems: 'start' }}>
+                  
+                  {/* Left: Custom features checkboxes & Quotas */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    
+                    {/* Core Core Price Card */}
+                    <div style={{ background: '#1E293B', color: 'white', padding: '1.5rem', borderRadius: '18px', border: '2px solid #6366F1' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div style={{ background: '#4F46E5', color: 'white', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 900 }}>INCLUDED</div>
+                          <h3 style={{ fontSize: '1.1rem', fontWeight: 900, margin: 0 }}>Responsive Storefront Catalog</h3>
+                        </div>
+                        <span style={{ fontSize: '1.1rem', fontWeight: 900, color: '#60A5FA' }}>₹199<span style={{ fontSize: '0.75rem', opacity: 0.7 }}>/mo</span></span>
+                      </div>
+                      <p style={{ color: '#E2E8F0', fontSize: '0.8rem', margin: 0, fontWeight: 500, lineHeight: 1.4 }}>
+                        Dynamic catalog webpage complete with Rupee checkout forms, order tracking, and client telemetry variables.
+                      </p>
+                    </div>
+
+                    {/* Features checklist */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                      {[
+                        { name: 'Advanced Custom Fields Builder', price: 150, desc: 'Allow custom dropdowns, date pickers, or text fields on catalog checkouts.' },
+                        { name: 'AI Chatbot Automation', price: 250, desc: 'Enable automated confirmation logs & AI conversational auto-replies on WhatsApp.' },
+                        { name: 'Shipping Integration', price: 300, desc: 'Provide tracking dispatches synced directly with Delhivery, Shiprocket, or Porter.' },
+                        { name: 'Advanced Styling Themes', price: 100, desc: 'Unlock premium styling theme templates (Luxury, Minimal, Dark Accent editors).' },
+                        { name: 'Commission-Free Sales', price: 200, desc: '0% platform sales commission fees on all transacted orders.' }
+                      ].map(feat => {
+                        const isChecked = selectedFeatures.includes(feat.name);
+                        return (
+                          <div
+                            key={feat.name}
+                            onClick={() => {
+                              setSelectedFeatures(prev => 
+                                isChecked ? prev.filter(x => x !== feat.name) : [...prev, feat.name]
+                              );
+                            }}
+                            style={{
+                              padding: '1rem 1.2rem',
+                              borderRadius: '16px',
+                              background: isChecked ? 'rgba(79, 70, 229, 0.04)' : '#FFFFFF',
+                              border: isChecked ? '2px solid #4F46E5' : '1px solid rgba(0,0,0,0.06)',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              transition: 'all 0.2s',
+                              boxSizing: 'border-box'
+                            }}
+                          >
+                            <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'flex-start', paddingRight: '1rem' }}>
+                              <div style={{
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '5px',
+                                border: isChecked ? 'none' : '2px solid rgba(0,0,0,0.15)',
+                                background: isChecked ? '#4F46E5' : 'transparent',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'white',
+                                marginTop: '2px',
+                                flexShrink: 0
+                              }}>
+                                {isChecked && <Check size={10} strokeWidth={4} style={{ margin: 'auto' }} />}
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: 800, color: 'var(--color-brown-dark)', fontSize: '0.85rem' }}>{feat.name}</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--color-brown)', opacity: 0.7, marginTop: '2px', lineHeight: 1.3 }}>{feat.desc}</div>
+                              </div>
+                            </div>
+                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                              <span style={{ display: 'block', fontSize: '0.9rem', fontWeight: 900, color: isChecked ? '#4F46E5' : 'var(--color-brown-dark)' }}>
+                                +₹{feat.price}
+                              </span>
+                              <span style={{ fontSize: '0.65rem', color: 'var(--color-brown)', opacity: 0.5, fontWeight: 700 }}>/ mo</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Messages Quota Counter */}
+                    <div style={{ background: '#FFF8F3', padding: '1.2rem', borderRadius: '18px', border: '1px solid rgba(122,78,58,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.8rem' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--color-pink)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Social Message Quota limit
+                      </span>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (customMessagesCount > 200) setCustomMessagesCount(prev => prev - 50);
+                          }}
+                          disabled={customMessagesCount <= 200}
+                          style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            border: '1px solid rgba(0,0,0,0.1)',
+                            background: customMessagesCount <= 200 ? '#F1F5F9' : '#FFFFFF',
+                            color: customMessagesCount <= 200 ? '#94A3B8' : 'var(--color-brown-dark)',
+                            fontSize: '1.2rem',
+                            fontWeight: 'bold',
+                            cursor: customMessagesCount <= 200 ? 'not-allowed' : 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                            outline: 'none'
+                          }}
+                        >
+                          −
+                        </button>
+                        
+                        <div style={{ textAlign: 'center', width: '160px' }}>
+                          <div style={{ fontSize: '1.8rem', fontWeight: 950, color: 'var(--color-brown-dark)', letterSpacing: '-0.5px' }}>
+                            {customMessagesCount}
+                          </div>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--color-brown)', opacity: 0.6, fontWeight: 800, textTransform: 'uppercase', display: 'block' }}>
+                            Messages / Month
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setCustomMessagesCount(prev => prev + 50)}
+                          style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            border: '1px solid rgba(0,0,0,0.1)',
+                            background: '#FFFFFF',
+                            color: 'var(--color-brown-dark)',
+                            fontSize: '1.2rem',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                            outline: 'none'
+                          }}
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <span style={{ fontSize: '0.7rem', color: 'var(--color-brown)', opacity: 0.8, fontWeight: 700 }}>
+                        {customMessagesCount <= 200 
+                          ? '✨ Baseline Quota (₹100 included in core price)' 
+                          : `📈 Accruing +${customMessagesCount - 200} extra messages at ₹25 per 50 block`}
                       </span>
                     </div>
-                  ))}
+
+                  </div>
+
+                  {/* Right: Price Projection & Checkout */}
+                  <div style={{ position: 'sticky', top: '20px', display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                    
+                    <div style={{
+                      background: '#0F172A',
+                      color: 'white',
+                      padding: '1.8rem',
+                      borderRadius: '24px',
+                      boxShadow: '0 15px 35px rgba(0,0,0,0.15)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      boxSizing: 'border-box'
+                    }}>
+                      <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white', margin: '0 0 6px 0', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Zap size={14} color="#60A5FA" /> Scope Cost Ledger
+                      </h3>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '1rem', fontSize: '0.8rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
+                          <span style={{ opacity: 0.75 }}>Core Storefront webpage hosting:</span>
+                          <span style={{ fontWeight: 800 }}>₹{getBillingDetails().baseHosting}/mo</span>
+                        </div>
+                        
+                        {selectedFeatures.map(feat => {
+                          let fPrice = 150;
+                          if (feat === 'AI Chatbot Automation') fPrice = 250;
+                          if (feat === 'Shipping Integration') fPrice = 300;
+                          if (feat === 'Advanced Styling Themes') fPrice = 100;
+                          if (feat === 'Commission-Free Sales') fPrice = 200;
+                          return (
+                            <div key={feat} style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, paddingLeft: '8px', borderLeft: '1.5px solid rgba(255,255,255,0.15)' }}>
+                              <span style={{ opacity: 0.65 }}>+ {feat}:</span>
+                              <span style={{ fontWeight: 700 }}>₹{fPrice}/mo</span>
+                            </div>
+                          );
+                        })}
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
+                          <span style={{ opacity: 0.75 }}>Custom Messages ({getBillingDetails().msgCount} msgs):</span>
+                          <span style={{ fontWeight: 800 }}>₹{getBillingDetails().totalMsgCost}/mo</span>
+                        </div>
+                        
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '0.6rem', marginTop: '0.3rem' }}>
+                          <span style={{ opacity: 0.85 }}>Subtotal:</span>
+                          <span style={{ fontWeight: 800 }}>₹{getBillingDetails().subtotal}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
+                          <span style={{ opacity: 0.75 }}>GST Tax (18%):</span>
+                          <span style={{ fontWeight: 800 }}>₹{getBillingDetails().tax}</span>
+                        </div>
+                      </div>
+
+                      <div style={{ borderTop: '2px dashed rgba(255,255,255,0.12)', paddingTop: '1rem', marginTop: '1.2rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '1.2rem' }}>
+                          <span style={{ fontSize: '0.95rem', fontWeight: 900 }}>Total Billing:</span>
+                          <span style={{ fontSize: '1.8rem', fontWeight: 950, color: '#60A5FA', tracking: '-1px' }}>
+                            ₹{getBillingDetails().total}
+                            <span style={{ fontSize: '0.75rem', color: '#94A3B8', fontWeight: 800 }}> / mo</span>
+                          </span>
+                        </div>
+                        
+                        {showCheckout ? (
+                          <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                              <button 
+                                type="button"
+                                onClick={() => setPaymentMethod('UPI')} 
+                                style={{ flex: 1, padding: '5px', borderRadius: '6px', border: 'none', background: paymentMethod === 'UPI' ? 'var(--color-pink)' : 'rgba(255,255,255,0.05)', color: 'white', fontWeight: 800, fontSize: '0.7rem', cursor: 'pointer' }}
+                              >
+                                UPI QR
+                              </button>
+                              <button 
+                                type="button"
+                                onClick={() => setPaymentMethod('Card')} 
+                                style={{ flex: 1, padding: '5px', borderRadius: '6px', border: 'none', background: paymentMethod === 'Card' ? 'var(--color-pink)' : 'rgba(255,255,255,0.05)', color: 'white', fontWeight: 800, fontSize: '0.7rem', cursor: 'pointer' }}
+                              >
+                                Card
+                              </button>
+                            </div>
+
+                            {paymentMethod === 'UPI' ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', background: '#FFFFFF', padding: '8px', borderRadius: '10px', color: '#0F172A' }}>
+                                <div style={{ width: '80px', height: '80px', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px', fontWeight: 900, fontSize: '0.65rem', border: '1.5px solid #E2E8F0', padding: '6px', boxSizing: 'border-box', textAlign: 'center' }}>
+                                  [UPI QR CODE ₹{getBillingDetails().total}]
+                                </div>
+                                <span style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: 800 }}>Scan QR from GPay / PhonePe</span>
+                              </div>
+                            ) : (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                <input 
+                                  type="text" 
+                                  placeholder="4111 2222 3333 4444" 
+                                  maxLength="19"
+                                  style={{ padding: '6px 8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white', fontSize: '0.75rem', fontWeight: 600, outline: 'none' }}
+                                />
+                                <div style={{ display: 'flex', gap: '5px' }}>
+                                  <input 
+                                    type="text" 
+                                    placeholder="MM/YY" 
+                                    style={{ flex: 1, padding: '6px 8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white', fontSize: '0.75rem', fontWeight: 600, outline: 'none' }}
+                                  />
+                                  <input 
+                                    type="password" 
+                                    placeholder="CVV" 
+                                    maxLength="3"
+                                    style={{ flex: 1, padding: '6px 8px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white', fontSize: '0.75rem', fontWeight: 600, outline: 'none' }}
+                                  />
+                                </div>
+                              </div>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={handleUpdateSubscription}
+                              disabled={isProcessingPay}
+                              style={{
+                                width: '100%',
+                                padding: '8px',
+                                background: 'var(--gradient-pink)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontWeight: 900,
+                                fontSize: '0.75rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '4px',
+                                boxShadow: '0 4px 10px rgba(242,140,163,0.2)'
+                              }}
+                            >
+                              {isProcessingPay ? (
+                                <>
+                                  <RefreshCw size={12} className="spin" style={{ margin: 'auto' }} /> Updating Scope...
+                                </>
+                              ) : (
+                                <>
+                                  <ShieldCheck size={12} /> Validate & Update Scope
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setShowCheckout(true)}
+                            style={{
+                              width: '100%',
+                              background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+                              color: 'white',
+                              border: 'none',
+                              padding: '1rem',
+                              borderRadius: '12px',
+                              fontSize: '0.9rem',
+                              fontWeight: 900,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              boxShadow: '0 8px 20px -5px rgba(79, 70, 229, 0.3)',
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            Update Storefront Scope <Zap size={14} />
+                          </button>
+                        )}
+
+                      </div>
+                    </div>
+
+                  </div>
+
                 </div>
+
               </div>
             )}
 

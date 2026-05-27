@@ -9,6 +9,7 @@ const Footer = () => {
     location.pathname.startsWith('/saas') || 
     location.pathname.startsWith('/super-admin') || 
     location.pathname.startsWith('/admin') || 
+    location.pathname.startsWith('/simulator') || 
     (isStorefront && !location.pathname.startsWith('/store/cakeflow-legacy'));
 
   if (isSaaSActive) {

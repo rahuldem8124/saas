@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, LayoutDashboard, ShoppingBag, Users, DollarSign, BarChart2, Truck, Ticket, Settings as SettingsIcon, Search, Filter, Plus, MoreVertical, Eye, MessageSquare, Trash2 } from 'lucide-react';
+import { Package, LayoutDashboard, ShoppingBag, Users, DollarSign, BarChart2, Truck, Ticket, Settings as SettingsIcon, Search, Filter, Plus, MoreVertical, Eye, MessageSquare, Trash2, Star } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTenant } from '../context/TenantContext';
@@ -7,7 +7,7 @@ import AdminNavbar from '../components/AdminNavbar';
 
 const AdminProducts = () => {
   const { user } = useAuth();
-  const { businesses, addProduct, deleteProduct } = useTenant();
+  const { businesses, addProduct, deleteProduct, editProduct } = useTenant();
   const location = useLocation();
 
   const activeBizId = user?.businessId || 'cakeflow';
@@ -135,13 +135,15 @@ const AdminProducts = () => {
                 <th style={{ padding: '1.5rem', color: 'var(--color-brown-dark)', fontWeight: 800 }}>Category</th>
                 <th style={{ padding: '1.5rem', color: 'var(--color-brown-dark)', fontWeight: 800 }}>Price</th>
                 <th style={{ padding: '1.5rem', color: 'var(--color-brown-dark)', fontWeight: 800 }}>Rating</th>
+                <th style={{ padding: '1.5rem', color: 'var(--color-brown-dark)', fontWeight: 800 }}>Status</th>
+                <th style={{ padding: '1.5rem', color: 'var(--color-brown-dark)', fontWeight: 800 }}>Featured</th>
                 <th style={{ padding: '1.5rem 2rem' }}></th>
               </tr>
             </thead>
             <tbody>
               {products.length === 0 ? (
                 <tr>
-                  <td colSpan="5" style={{ padding: '3rem', textAlign: 'center', opacity: 0.5, fontWeight: 700 }}>No products in this scoped catalog. Click Add Scoped Product to create one!</td>
+                  <td colSpan="7" style={{ padding: '3rem', textAlign: 'center', opacity: 0.5, fontWeight: 700 }}>No products in this scoped catalog. Click Add Scoped Product to create one!</td>
                 </tr>
               ) : (
                 products.map(product => (
@@ -155,6 +157,46 @@ const AdminProducts = () => {
                     <td style={{ padding: '1.2rem' }}>{product.category}</td>
                     <td style={{ padding: '1.2rem', fontWeight: 800, color: 'var(--color-pink)' }}>{product.price}</td>
                     <td style={{ padding: '1.2rem', fontWeight: 600 }}>{product.rating || '4.8'} ⭐</td>
+                    <td style={{ padding: '1.2rem' }}>
+                      <button
+                        onClick={() => editProduct(biz.id, { ...product, isActive: product.isActive !== false ? false : true })}
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          fontSize: '0.75rem',
+                          fontWeight: 900,
+                          cursor: 'pointer',
+                          background: product.isActive !== false ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)' : '#E2E8F0',
+                          color: product.isActive !== false ? 'white' : '#64748B',
+                          border: 'none',
+                          boxShadow: product.isActive !== false ? '0 2px 6px rgba(16, 185, 129, 0.2)' : 'none',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {product.isActive !== false ? "ACTIVE" : "INACTIVE"}
+                      </button>
+                    </td>
+                    <td style={{ padding: '1.2rem' }}>
+                      <button
+                        onClick={() => editProduct(biz.id, { ...product, isFeatured: !product.isFeatured })}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          background: product.isFeatured ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' : '#E2E8F0',
+                          color: product.isFeatured ? 'white' : '#64748B',
+                          border: 'none',
+                          boxShadow: product.isFeatured ? '0 2px 6px rgba(245, 158, 11, 0.2)' : 'none',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <Star size={14} fill={product.isFeatured ? "white" : "none"} stroke={product.isFeatured ? "none" : "#64748B"} />
+                      </button>
+                    </td>
                     <td style={{ padding: '1.2rem 2rem', textAlign: 'right' }}>
                       <button 
                         onClick={() => {
